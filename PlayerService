@@ -1,0 +1,12 @@
+package edu.gmu.isa681.service;
+
+import edu.gmu.isa681.model.Player;
+
+public interface PlayerService {
+
+	void save(Player player);
+
+	Player findById(int id);
+
+	Player findBySso(String sso);
+}
