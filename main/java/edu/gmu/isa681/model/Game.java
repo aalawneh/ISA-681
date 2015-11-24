@@ -16,7 +16,7 @@ public class Game implements Serializable {
 	
 	@Id
 	@NotNull
-	@Column(name="GAME_ID")
+	@Column(name="game_id")
 	private int gameId;
 
 	@NotNull

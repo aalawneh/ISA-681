@@ -20,8 +20,11 @@ public class GameDaoImpl extends AbstractDao<Integer, Game> implements GameDao {
 
 		String hql = "select max(g.gameId) from Game g";
 		Query query = getSession().createQuery(hql);
+		Integer max = 0;
 
-		Integer max = (Integer) query.list().get(0);
+		if (query.list().get(0) != null) {
+			max = (Integer) query.list().get(0);
+		}
 
 		System.out.println("+++++++++++++++++ Total games so far is = " + max);
 		System.out.println("+++++++++++++++++ next game id = " + (max + 1));
