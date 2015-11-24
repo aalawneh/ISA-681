@@ -12,7 +12,7 @@ public interface UnregisteredPlayerService {
 
 	public Integer isValidPlayerSso(String sso);
 	
-	public Integer isValidPlayerPassword(String pwd1, String pwd2);
+	public Integer isValidPlayerPassword(String password);
 	
 	public Integer isValidPlayerEmail(String email);
 
