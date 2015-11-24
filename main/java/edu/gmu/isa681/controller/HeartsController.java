@@ -108,7 +108,6 @@ public class HeartsController {
             System.out.println("There are errors");
             return "register";
         }
-        playerService.save(player);
 
         System.out.println("First Name : "+player.getFirstName());
         System.out.println("Last Name : "+player.getLastName());
@@ -117,6 +116,7 @@ public class HeartsController {
         System.out.println("Email : "+player.getEmail());
         System.out.println("Checking UsrProfiles....");
 
+        playerService.save(player);
         model.addAttribute("success", "Player " + player.getFirstName() + " has been registered successfully");
         model.addAttribute("newPlayer", "Y");
         return "login";

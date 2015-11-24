@@ -29,6 +29,11 @@
 								<p>You have been logged out successfully.</p>
 							</div>
 						</c:if>
+		                <c:if test="${newPlayer eq 'Y' || newPlayer eq 'y'}">
+							<div class="alert alert-success">
+					            <p>Confirmation message : ${success}</p>
+							</div>
+		                </c:if>
 						<div class="input-group input-sm">
 							<label class="input-group-addon" for="playername"><i
 								class="fa fa-user"></i></label> <input type="text" class="form-control"

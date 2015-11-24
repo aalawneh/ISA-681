@@ -37,13 +37,8 @@ table#t01 {
 			</tr>
 		</table>
 		<br /> <br />
-		<c:if test="${newPlayer eq 'Y' || newPlayer eq 'y'}">
-			<table style="width: 100% border: 0">
-				<tr>
-					<td align="left" colspan="3">Confirmation message : ${success}</td>
-   				</tr>
-   			</table>
-		</c:if>
+		
+
 
 		<c:if test="${newPlayer ne 'Y' && newPlayer ne 'y'}">
 			<table style="width: 100%" class="bord">
