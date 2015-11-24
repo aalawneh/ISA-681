@@ -119,7 +119,7 @@ public class HeartsController {
 
         model.addAttribute("success", "Player " + player.getFirstName() + " has been registered successfully");
         model.addAttribute("newPlayer", "Y");
-        return "home";
+        return "login";
     }
 
     @RequestMapping(value="/board", method = RequestMethod.GET)
