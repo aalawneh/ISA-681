@@ -115,21 +115,7 @@ public class HeartsController {
         }
         
         Player player = new Player();
-        String errMsg = "";
-        
-        if (!uPlayer.getPassword().equals(uPlayer.getPassword2())) {
-        	errMsg = "Passwords do not match";
-        } if (unregisteredPlayerService.isValidPlayerFirstName(uPlayer.getFirstName()) == 0) {
-        	errMsg = "Invalid First Name.";
-        } else if (unregisteredPlayerService.isValidPlayerLastName(uPlayer.getLastName()) == 0) {
-        	errMsg = "Invalid Last Name.";
-        } else if (unregisteredPlayerService.isValidPlayerSso(uPlayer.getSsoId()) == 0) {
-        	errMsg = "Invalid SSO ID.";
-        } else if (unregisteredPlayerService.isValidPlayerPassword(uPlayer.getPassword(), uPlayer.getPassword2()) == 0) {
-        	errMsg = "Invalid Password.";
-        } else if (unregisteredPlayerService.isValidPlayerEmail(uPlayer.getEmail()) == 0) {
-        	errMsg = "Invalid Email Address.";
-        }
+        String errMsg = unregisteredPlayerService.checkPlayer(uPlayer);
         
         if (!errMsg.isEmpty()) {
             model.addAttribute("failure", errMsg);
@@ -144,6 +130,8 @@ public class HeartsController {
         player.setPassword(uPlayer.getPassword());
         player.setEmail(uPlayer.getEmail());
 
+        playerService.save(player);
+
         System.out.println("First Name : "+player.getFirstName());
         System.out.println("Last Name : "+player.getLastName());
         System.out.println("SSO ID : "+player.getSsoId());
@@ -151,7 +139,6 @@ public class HeartsController {
         System.out.println("Email : "+player.getEmail());
         System.out.println("Checking UsrProfiles....");
 
-        playerService.save(player);
         model.addAttribute("success", "Player " + player.getFirstName() + " has been registered successfully");
         model.addAttribute("newPlayer", "Y");
         return "login";
