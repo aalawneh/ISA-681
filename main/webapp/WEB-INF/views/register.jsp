@@ -20,6 +20,12 @@
 		<h1>New Player Registration Form</h1>
 
 		<form:form method="POST" modelAttribute="player" class="form-horizontal">
+		
+		    <c:if test="${playerError eq 'Y' || playerError eq 'y'}">
+			    <div class="alert alert-danger">
+					<p>Error message : ${failure}</p>
+				</div>
+		    </c:if>
 
 			<div class="row">
 				<div class="form-group col-md-12">
@@ -70,6 +76,19 @@
 							class="form-control input-sm" />
 						<div class="has-error">
 							<form:errors path="password" class="help-inline" />
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-group col-md-12">
+					<label class="col-md-3 control-lable" for="password2">Repeat Password</label>
+					<div class="col-md-7">
+						<form:input type="password" path="password2" id="password2"
+							class="form-control input-sm" />
+						<div class="has-error">
+							<form:errors path="password2" class="help-inline" />
 						</div>
 					</div>
 				</div>

@@ -33,10 +33,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.gmu.isa681.model.Player;
+import edu.gmu.isa681.model.UnregisteredPlayer;
 import edu.gmu.isa681.dto.GameDto;
 import edu.gmu.isa681.dto.PlayerGamesDto;
 import edu.gmu.isa681.service.GameService;
 import edu.gmu.isa681.service.PlayerService;
+import edu.gmu.isa681.service.UnregisteredPlayerService;
 
 @Controller
 public class HeartsController {
@@ -44,6 +46,9 @@ public class HeartsController {
 	@Autowired
 	PlayerService playerService;
 
+	@Autowired
+	UnregisteredPlayerService unregisteredPlayerService;
+	
 	@Autowired
 	GameService gameService;
 
@@ -91,8 +96,8 @@ public class HeartsController {
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String newRegistration(ModelMap model) {
-    	Player player = new Player();
-        model.addAttribute("player", player);
+    	UnregisteredPlayer uPlayer = new UnregisteredPlayer();
+        model.addAttribute("player", uPlayer);
         return "register";
     }
 
@@ -101,13 +106,43 @@ public class HeartsController {
      * also validates the player input
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String saveRegistration(@Valid Player player,
+    public String saveRegistration(@Valid UnregisteredPlayer uPlayer,
             BindingResult result, ModelMap model) {
 
         if (result.hasErrors()) {
             System.out.println("There are errors");
             return "register";
         }
+        
+        Player player = new Player();
+        String errMsg = "";
+        
+        if (!uPlayer.getPassword().equals(uPlayer.getPassword2())) {
+        	errMsg = "Passwords do not match";
+        } if (unregisteredPlayerService.isValidPlayerFirstName(uPlayer.getFirstName()) == 0) {
+        	errMsg = "Invalid First Name.";
+        } else if (unregisteredPlayerService.isValidPlayerLastName(uPlayer.getLastName()) == 0) {
+        	errMsg = "Invalid Last Name.";
+        } else if (unregisteredPlayerService.isValidPlayerSso(uPlayer.getSsoId()) == 0) {
+        	errMsg = "Invalid SSO ID.";
+        } else if (unregisteredPlayerService.isValidPlayerPassword(uPlayer.getPassword(), uPlayer.getPassword2()) == 0) {
+        	errMsg = "Invalid Password.";
+        } else if (unregisteredPlayerService.isValidPlayerEmail(uPlayer.getEmail()) == 0) {
+        	errMsg = "Invalid Email Address.";
+        }
+        
+        if (!errMsg.isEmpty()) {
+            model.addAttribute("failure", errMsg);
+            model.addAttribute("playerError", "Y");
+            model.addAttribute("player", uPlayer);
+        	return "register";
+        }
+        
+        player.setFirstName(uPlayer.getFirstName());
+        player.setLastName(uPlayer.getLastName());
+        player.setSsoId(uPlayer.getSsoId());
+        player.setPassword(uPlayer.getPassword());
+        player.setEmail(uPlayer.getEmail());
 
         System.out.println("First Name : "+player.getFirstName());
         System.out.println("Last Name : "+player.getLastName());
