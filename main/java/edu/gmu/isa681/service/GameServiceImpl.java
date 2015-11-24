@@ -198,6 +198,7 @@ public class GameServiceImpl implements GameService {
 		if(gameToJoin != null) {
 			gameDto = new GameDto();
 			gameDto.setGameId(gameToJoin.getGamePlayerKey().getGameId());
+			gameDto.setGameStatus(gameDao.findGameById(gameDto.getGameId()).getStatus());
 			gameDto.setPlayerId(gameToJoin.getGamePlayerKey().getPlayerId());
 			gameDto.setPlayerPosition(gameToJoin.getPosition());
 			gameDto.setPlayerScore(gameToJoin.getScore());

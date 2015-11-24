@@ -45,26 +45,25 @@
 						<td>
 							<table border="0" width="100%">
 							    <tr>
-				                                <td colspan="2"><a href="<c:url value="/home" />">Home</a>    <a href="<c:url value="/logout" />">Logout</a></td>
-				                            </tr>
-				                        </table>
+				                    <td colspan="2"><a href="<c:url value="/home" />">Home</a>    <a href="<c:url value="/logout" />">Logout</a></td>
+				                </tr>
+				            </table>
 							&nbsp;&nbsp;&nbsp;
 							<table border="0">
 							    <tr>
-                                                                <th colspan="4" width="100%" nowrap="nowrap">Game ${game.gameId} Status: &nbsp;&nbsp;&nbsp;
-                                                                    <c:choose> 
-                                                                        <c:when test="${game.gameStatus eq 'W'}"><div style="color: red;">Waiting for More Players...</div></c:when>
-                                                                        <c:when test="${game.gameStatus eq 'G'}"><div style="color: green;">In Progress...</div></c:when>
-                                                                        <c:when test="${game.gameStatus eq 'O'}">Complete.</c:when>
-                                                                    </c:choose>
-                                                                </th>
-                                                            </tr>
-						        </table>
+                                    <th colspan="4" width="100%" nowrap="nowrap">Game ${game.gameId} Status: &nbsp;&nbsp;&nbsp;
+                                        <c:choose> 
+                                            <c:when test="${game.gameStatus eq 'W'}"><div style="color: red;">Waiting for More Players...</div></c:when>
+                                            <c:when test="${game.gameStatus eq 'G'}"><div style="color: green;">In Progress...</div></c:when>
+                                            <c:when test="${game.gameStatus eq 'O'}">Complete.</c:when>
+                                        </c:choose>
+                                    </th>
+                                </tr>
+						    </table>
 							&nbsp;&nbsp;&nbsp;
-                                                        <table>
+                            <table>
 								<tr>
-                                                                        <td valign="top" align="left" nowrap="nowrap">Score
-                                                                                &nbsp;&nbsp;&nbsp;</td>
+                                    <td valign="top" align="left" nowrap="nowrap">Score&nbsp;&nbsp;</td>
 									<td align="right">
 										<table border="1">
 											<tr>
