@@ -18,7 +18,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 	}
 
 	/*
-	 * mysql> select * from player_game gp, game g where gp.game_id = g.game_id and g.status = 'O' and gp.game_id in (select game_id from player_game where player_id = 1);
+	 * mysql> select * from game_player gp, game g where gp.game_id = g.game_id and g.status = 'O' and gp.game_id in (select game_id from game_player where player_id = 1);
 	 */
 	public List<GamePlayer> getPlayerGamesResults(int playerId) {
 		String hql = "select pg from GamePlayer pg, Game g "
@@ -39,7 +39,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 	}
 
 	// Check if the player already in a game and the game is not over.
-	// select * from player_game pg, game g where g.game_id = pg.game_id and player_id = 2 and status != 'O'; -- OVER
+	// select * from game_player pg, game g where g.game_id = pg.game_id and player_id = 2 and status != 'O'; -- OVER
 	@SuppressWarnings("unchecked")
 	public GamePlayer getPlayerOpenGame(int playerId) {
 
@@ -58,7 +58,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 		return playerGame;
 	}
 
-	// mysql> select game_id, count(player_id) from player_game group by game_id having count(player_id) < 4;
+	// mysql> select game_id, count(player_id) from game_player group by game_id having count(player_id) < 4;
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getOpenGame(int playerId) {
 

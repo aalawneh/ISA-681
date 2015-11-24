@@ -149,7 +149,6 @@ public class HeartsController {
 
     @RequestMapping(value="/play", method = RequestMethod.GET)
     public String play(@RequestParam(value="gameId", required=true) int gameId, 
-    		           @RequestParam(value="handId", required=true) int handId, 
     		           @RequestParam(value="cardId", required=true) String cardId, 
     		           ModelMap model) {
     	
@@ -158,11 +157,10 @@ public class HeartsController {
     	// First mark the card that it has been used
     	System.out.println("+++++++++++++++++++++++++ playerId = " + playerId);
     	System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
-    	System.out.println("+++++++++++++++++++++++++ handId = " + handId);
     	System.out.println("+++++++++++++++++++++++++ cardId = " + cardId);
     	cardId = cardId.replaceAll("'", "");
     	System.out.println("+++++++++++++++++++++++++ cardId = " + cardId);
-    	gameService.play(playerId, gameId, handId, cardId);
+    	gameService.play(playerId, gameId, cardId);
     	
     	// 1. a) Check if the player already in a game and the game is not over, then return the game Id.
     	//    b) Else check if there is an open game then have him join the game and return the game Id.

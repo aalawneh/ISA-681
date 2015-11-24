@@ -9,5 +9,5 @@ public interface GameService {
 	
 	public GameDto joinAGame(int playerId);
 	
-	public void play(int playerId, int gameId, int handId, String cardId);
+	public void play(int playerId, int gameId, String cardId);
 }

@@ -10,7 +10,9 @@ public interface GameMoveDao {
 
 	public List<String> getPlayerCards(int playerId, int gameId);
 	
-	public Integer getHandId(int playerId, int gameId);
+	public Integer getCurrHand(int playerId, int gameId);
 	
-	public void updateCardStatus(int playerId, int gameId, int handId, String cardId);
+	public List<Object[]> getCurrRound(int gameId);
+	
+	public void updateCardStatus(int playerId, int gameId, int handId, String cardId, int roundId);
 }

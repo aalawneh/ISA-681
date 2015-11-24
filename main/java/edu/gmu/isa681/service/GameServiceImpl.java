@@ -1,5 +1,6 @@
 package edu.gmu.isa681.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,11 +125,11 @@ public class GameServiceImpl implements GameService {
 				newGame.setGameId(newGameId);
 				newGame.setStatus(GameStatus.WAITING.getStatus()); // status is waiting for quorum to reach 4
 				
-				GamePlayerKey playerGameKey = new GamePlayerKey();
-				playerGameKey.setGameId(newGame.getGameId());
-				playerGameKey.setPlayerId(playerId);
+				GamePlayerKey gamePlayerKey = new GamePlayerKey();
+				gamePlayerKey.setGameId(newGame.getGameId());
+				gamePlayerKey.setPlayerId(playerId);
 				
-				gameToJoin.setGamePlayerKey(playerGameKey);
+				gameToJoin.setGamePlayerKey(gamePlayerKey);
 				gameToJoin.setPosition(0);	// first one to join then he sits at position 0
 				gameToJoin.setScore(0);
 				gameDao.save(newGame);
@@ -145,11 +146,11 @@ public class GameServiceImpl implements GameService {
 					System.out.println("Total opponents in game with id " + currGameId + " is " + opponents);
 			    }
 				
-				GamePlayerKey playerGameKey = new GamePlayerKey();
-				playerGameKey.setGameId(currGameId.intValue());
-				playerGameKey.setPlayerId(playerId);
+				GamePlayerKey gamePlayerKey = new GamePlayerKey();
+				gamePlayerKey.setGameId(currGameId.intValue());
+				gamePlayerKey.setPlayerId(playerId);
 				
-				gameToJoin.setGamePlayerKey(playerGameKey);
+				gameToJoin.setGamePlayerKey(gamePlayerKey);
 				gameToJoin.setPosition(opponents.intValue());
 				gameToJoin.setScore(0);
 				gamePlayerDao.save(gameToJoin);
@@ -190,15 +191,14 @@ public class GameServiceImpl implements GameService {
 			}
 		}
 		else {
-			// return the game he is in - he can be on only one open game at a time			
+			// return him to the game he is already in - he can be on only one open game at a time			
 			gameToJoin = playerOpenGame;
 		}
 		
 		if(gameToJoin != null) {
 			gameDto = new GameDto();
 			gameDto.setGameId(gameToJoin.getGamePlayerKey().getGameId());
-			gameDto.setGameStatus(gameDao.findGameById(gameDto.getGameId()).getStatus());
-                        gameDto.setPlayerId(gameToJoin.getGamePlayerKey().getPlayerId());
+			gameDto.setPlayerId(gameToJoin.getGamePlayerKey().getPlayerId());
 			gameDto.setPlayerPosition(gameToJoin.getPosition());
 			gameDto.setPlayerScore(gameToJoin.getScore());
 			List<OpponentsDto> opponents = new ArrayList<OpponentsDto>();
@@ -221,17 +221,47 @@ public class GameServiceImpl implements GameService {
 			
 			// get player cards
 			List<String> playerCards = gameMoveDao.getPlayerCards(gameDto.getPlayerId(), gameDto.getGameId());
-			Integer handId = gameMoveDao.getHandId(gameDto.getPlayerId(), gameDto.getGameId());
+			
+			//if playerCards.size() == 0
+			
 			gameDto.setPlayerCards(playerCards);
-			if(handId == null) handId = 0;
-			gameDto.setHandId(handId);
 		}
 		
 		return gameDto;
 	}
 
-	public void play(int playerId, int gameId, int handId, String cardId) {
-		// We need to change the status of the card from "hand" - i.e. not played - to "table" 
-		//gameMoveDao.updateCardStatus(playerId, gameId, handId, cardId);			
+	public void play(int playerId, int gameId, String cardId) {
+		// We need to change the status of the card 
+		// if round_id has some value then this indicate that the card has already been played in that round
+		
+		Integer currHand = gameMoveDao.getCurrHand(playerId, gameId);
+		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
+		
+		Integer currRound = null;
+		Integer playerCounter = null; // how many player played in this round so far not including the current player
+
+		for (Object[] item : result) {
+			currRound = ((BigInteger) item[0]).intValue();
+			playerCounter = ((BigInteger) item[1]).intValue();
+	    }		
+		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
+		System.out.println("+++++++++++++++++ playerCounter = " + playerCounter);
+		
+		if(currRound == null) {
+			currRound = 1;
+		}
+		else if(playerCounter == 4) {
+			// everytime the current player count who played a round reaches 4 then start a new round
+			currRound += 1;
+		}
+		else if(playerCounter == 3) {
+			// this means that this player is going to play his card making a complete round
+			// which means we are ready to calculate who lost.
+			
+			//TODO: calculate who lost in this block of code.
+			// check if the game is over too!!! when some has a score > 100
+		}
+		
+		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);		
 	}
 }

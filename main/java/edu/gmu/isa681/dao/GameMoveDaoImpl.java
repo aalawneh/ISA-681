@@ -37,51 +37,57 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 		return results;		
 	}
 	
-	public Integer getHandId(int playerId, int gameId) {
-		System.out.println("++++++++++++++++ in getHandId method");
-		System.out.println("++++++++++++++++ GameId = " + gameId);
-		System.out.println("++++++++++++++++ playerId = " + playerId);
+	public Integer getCurrHand(int playerId, int gameId) {
+		String hql = "select max(gameMoveKey.handId) from GameMove where gameMoveKey.playerId = :playerId and gameMoveKey.gameId = :gameId";
+		Query query = getSession().createQuery(hql);
+		query.setInteger("playerId", new Integer(playerId));
+		query.setInteger("gameId", new Integer(gameId));
+		
+		Integer handId = (Integer) query.list().get(0);
 
-		Criteria crit = getSession().createCriteria(GameMove.class)
-				.setProjection(Projections.distinct(Projections.property("gameMoveKey.handId")))
-				.add(Restrictions.eq("gameMoveKey.gameId", gameId))
-				.add(Restrictions.eq("gameMoveKey.playerId", playerId))
-				.add(Restrictions.eq("roundId", null));
-		//crit.addOrder(Order.asc("gameMoveKey.cardId"));
-		@SuppressWarnings("unchecked")
-		List<Integer> results = crit.list();
-		Integer handId = null;
-		if(results != null && !results.isEmpty()) {
-			 handId = results.get(0);
-			 System.out.println("++++++++++++++++ handId = " + handId.toString());
-		}
+		System.out.println("+++++++++++++++++ current handId=" + handId + " for gameId=" + gameId + " and playerId=" + playerId);
 
 		return handId;		
 	}
 	
-	public void updateCardStatus(int playerId, int gameId, int handId, String cardId) {
+	//
+	public List<Object[]> getCurrRound(int gameId) {
+		String hql = "select round_id, count(player_id) "
+				+ " from game_move where round_id = (select max(round_id) from game_move where game_id = :gameId) "
+				+ " group by round_id having count(player_id) <= 4";
+		Query query = getSession().createSQLQuery(hql);
+		query.setInteger("gameId", new Integer(gameId));
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> result = (List<Object[]>) query.list();
+				
+		return result;		
+	}
+	
+	public void updateCardStatus(int playerId, int gameId, int handId, String cardId, int roundId) {
 
 		System.out.println("++++++++++++++++ in updateCardStatus method");
 
     	System.out.println("+++++++++++++++++++++++++ playerId = " + playerId);
     	System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
+    	System.out.println("+++++++++++++++++++++++++ handId = " + handId);
     	System.out.println("+++++++++++++++++++++++++ cardId = " + cardId);
 
-		String hql = "update gameMove GameMove set gameMove.roundId = :roundId "
-				+ " where playCards.gameMoveKey.playerId = :playerId "
-				+ " and playCards.gameMoveKey.gameId = :gameId "
-				+ " and playCards.gameMoveKey.handId = :handId "
-				+ " and playCards.gameMoveKey.cardId = :cardId";
+		String hql = "update GameMove gameMove set gameMove.roundId = :roundId "
+				+ " where gameMove.gameMoveKey.playerId = :playerId "
+				+ " and gameMove.gameMoveKey.gameId = :gameId "
+				+ " and gameMove.gameMoveKey.handId = :handId "
+				+ " and gameMove.gameMoveKey.cardId = :cardId";
 	    
-		/*Query query = getSession().createQuery(hql)
-				.setString("roundId", )
+		Query query = getSession().createQuery(hql)
+				.setInteger("roundId", new Integer(roundId))
 				.setInteger("playerId", new Integer(playerId))
 				.setInteger("gameId", new Integer(gameId))
 				.setInteger("handId", new Integer(handId))
-				.setString("cardId", cardId.trim().toLowerCase());*/
+				.setString("cardId", cardId.trim().toLowerCase());
 		
-		//int result = query.executeUpdate();
+		int result = query.executeUpdate();
 		
-		//System.out.println("Rows affected: " + result);		
+		System.out.println("Rows affected: " + result);		
 	}
 }

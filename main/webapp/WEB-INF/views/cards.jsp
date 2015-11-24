@@ -16,7 +16,7 @@
 		<c:when test="${back ne 1 && quorum ne 0}">
 			<c:forEach var="item" items="${game.playerCards}">
 				<li>
-					<a class="card rank-<c:out value="${item}" />" href="<c:url value="/play?gameId=${game.gameId}&handId=${game.handId}&cardId='${item}'" />"> 
+					<a class="card rank-<c:out value="${item}" />" href="<c:url value="/play?gameId=${game.gameId}&cardId='${item}'" />"> 
 						<c:choose>
 						    <c:when test="${fn:startsWith(item, '10')}">
 								<span class="rank"><c:out value="${fn:substring(item, 0, 2)}" /></span>
