@@ -21,4 +21,10 @@ public class PlayerDaoImpl extends AbstractDao<Integer, Player> implements Playe
 		crit.add(Restrictions.eq("ssoId", sso));
 		return (Player) crit.uniqueResult();
 	}
+	
+	public Player findByEmail(String email) {
+		Criteria crit = createEntityCriteria();
+		crit.add(Restrictions.eqOrIsNull("email", email));
+		return (Player) crit.uniqueResult();
+	}
 }

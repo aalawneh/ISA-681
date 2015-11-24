@@ -9,4 +9,6 @@ public interface PlayerDao {
 	public Player findPlayerById(int id);
 
 	public Player findBySSO(String sso);
+	
+	public Player findByEmail(String email);
 }

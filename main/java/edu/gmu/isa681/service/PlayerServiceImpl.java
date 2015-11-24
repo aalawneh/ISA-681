@@ -31,5 +31,9 @@ public class PlayerServiceImpl implements PlayerService{
 	public Player findBySso(String sso) {
 		return dao.findBySSO(sso);
 	}
+
+	public Player findByEmail(String email) {
+		return dao.findByEmail(email);
+	}
 	
 }
