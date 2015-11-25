@@ -132,12 +132,12 @@ public class HeartsController {
 
         playerService.save(player);
 
-        System.out.println("First Name : "+player.getFirstName());
-        System.out.println("Last Name : "+player.getLastName());
-        System.out.println("SSO ID : "+player.getSsoId());
-        System.out.println("Password : "+player.getPassword());
-        System.out.println("Email : "+player.getEmail());
-        System.out.println("Checking UsrProfiles....");
+//        System.out.println("First Name : "+player.getFirstName());
+//        System.out.println("Last Name : "+player.getLastName());
+//        System.out.println("SSO ID : "+player.getSsoId());
+//        System.out.println("Password : "+player.getPassword());
+//        System.out.println("Email : "+player.getEmail());
+//        System.out.println("Checking UsrProfiles....");
 
         model.addAttribute("success", "Player " + player.getSsoId() + " has been registered successfully.");
         model.addAttribute("newPlayer", "Y");
