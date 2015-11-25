@@ -31,7 +31,7 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
         } else if (isValidPlayerSso(uPlayer.getSsoId()) == 0) {
         	errMsg = "Invalid SSO ID.  <br>"
         			+ "Only alpha-numeric characters allowed, between 1 and 10 characters.";
-        } else if (isMatchPlayerSso(uPlayer.getSsoId()) == 0) {
+        } else if (isAvailPlayerSso(uPlayer.getSsoId()) == 0) {
         	errMsg = "SSO ID already in use.";
         } else if (isValidPlayerPassword(uPlayer.getPassword()) == 0) {
         	errMsg = "Invalid Password.  <br>"
@@ -45,7 +45,7 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
         } else if (isValidPlayerEmail(uPlayer.getEmail()) == 0) {
         	errMsg = "Invalid Email Address.  <br>"
         			+ "Only valid email formats allowed, between 6 and 64 characters.";
-        } else if (isMatchPlayerEmail(uPlayer.getEmail()) == 0) {
+        } else if (isAvailPlayerEmail(uPlayer.getEmail()) == 0) {
         	errMsg = "Email Address already in use.";
         }
 		
@@ -118,12 +118,12 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
 	    return isValid;
 	}
 
-	public Integer isMatchPlayerSso(String sso) {
-		return dao.isMatchPlayerSso(sso);
+	public Integer isAvailPlayerSso(String sso) {
+		return dao.isAvailPlayerSso(sso);
 	}
 
-	public Integer isMatchPlayerEmail(String email) {
-		return dao.isMatchPlayerEmail(email);
+	public Integer isAvailPlayerEmail(String email) {
+		return dao.isAvailPlayerEmail(email);
 	}
 
 }

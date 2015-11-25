@@ -16,8 +16,8 @@ public interface UnregisteredPlayerService {
 	
 	public Integer isValidPlayerEmail(String email);
 
-	public Integer isMatchPlayerSso(String sso);
+	public Integer isAvailPlayerSso(String sso);
 
-	public Integer isMatchPlayerEmail(String email);
+	public Integer isAvailPlayerEmail(String email);
 	
 }
