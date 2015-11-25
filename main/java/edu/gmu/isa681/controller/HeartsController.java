@@ -139,7 +139,7 @@ public class HeartsController {
         System.out.println("Email : "+player.getEmail());
         System.out.println("Checking UsrProfiles....");
 
-        model.addAttribute("success", "Player " + player.getFirstName() + " has been registered successfully");
+        model.addAttribute("success", "Player " + player.getSsoId() + " has been registered successfully.");
         model.addAttribute("newPlayer", "Y");
         return "login";
     }
