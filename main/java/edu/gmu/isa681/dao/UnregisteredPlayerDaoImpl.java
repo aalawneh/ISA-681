@@ -10,18 +10,12 @@ public class UnregisteredPlayerDaoImpl extends AbstractDao<Integer, Unregistered
 	@Autowired
 	private PlayerDao dao;
 
-	public Integer isMatchPlayerSso(String sso) {
-		if (!dao.findListSSO(sso).isEmpty()) {
-			return 0;
-		}
-		return 1;
+	public Integer isAvailPlayerSso(String sso) {
+		return dao.isAvailPlayerSSO(sso);
 	}
 
-	public Integer isMatchPlayerEmail(String email) {
-		if (!dao.findListEmail(email).isEmpty()) {
-			return 0;
-		}
-		return 1;
+	public Integer isAvailPlayerEmail(String email) {
+		return dao.isAvailPlayerEmail(email);
 	}
 	
 }

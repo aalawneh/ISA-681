@@ -1,7 +1,5 @@
 package edu.gmu.isa681.dao;
 
-import java.util.List;
-
 import edu.gmu.isa681.model.Player;
 
 public interface PlayerDao {
@@ -14,7 +12,7 @@ public interface PlayerDao {
 	
 	public Player findByEmail(String email);
 	
-	public List<Player>  findListSSO(String sso);
+	public Integer isAvailPlayerSSO(String sso);
 	
-	public List<Player>  findListEmail(String email);
+	public Integer isAvailPlayerEmail(String email);
 }

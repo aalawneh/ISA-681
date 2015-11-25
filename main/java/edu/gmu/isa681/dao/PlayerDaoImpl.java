@@ -2,8 +2,6 @@ package edu.gmu.isa681.dao;
 
 import edu.gmu.isa681.model.Player;
 
-import java.util.List;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -31,17 +29,19 @@ public class PlayerDaoImpl extends AbstractDao<Integer, Player> implements Playe
 		return (Player) crit.uniqueResult();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Player> findListSSO(String sso){
+	public Integer isAvailPlayerSSO(String sso){
 		Criteria crit = createEntityCriteria();
 		crit.add(Restrictions.eq("ssoId", sso));
-		return (List<Player>) crit.list();
+		if (crit.list().isEmpty())
+			return 1;
+		return 0;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Player> findListEmail(String email){
+	public Integer isAvailPlayerEmail(String email){
 		Criteria crit = createEntityCriteria();
 		crit.add(Restrictions.eq("email", email));
-		return (List<Player>) crit.list();
+		if (crit.list().isEmpty())
+			return 1;
+		return 0;
 	}
 }
