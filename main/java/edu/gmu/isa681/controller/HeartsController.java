@@ -31,6 +31,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.gmu.isa681.model.Player;
 import edu.gmu.isa681.model.UnregisteredPlayer;
@@ -167,6 +168,30 @@ public class HeartsController {
         model.addAttribute("quorum", quorum);
 
         return "board";
+    }
+    
+    @RequestMapping(value="/currgamestatus", method = RequestMethod.GET)
+    public @ResponseBody String gameStatus(ModelMap model) {
+    	String myGameStatus = "";
+    	String status = "";
+    	int playerId = LoggedInPlayer.getLoggedInPlayerId();
+    	
+    	status = gameService.getGameStatusForPlayer(playerId);
+
+//        <c:when test="${game.gameStatus eq 'W'}"><div style="color: red;">Waiting for More Players...</div></c:when>
+//        <c:when test="${game.gameStatus eq 'G'}"><div style="color: green;">In Progress...</div></c:when>
+//        <c:when test="${game.gameStatus eq 'O'}">Complete.</c:when>
+    	if (status.equals("")) {
+    		myGameStatus = "<div style=\"color: red;\">Determining Game Status...</div>";
+    	} else if (status.equals("W")) {
+    		myGameStatus = "<div style=\"color: red;\">Waiting for More Players...</div>";
+    	} else if (status.equals("G")) {
+    		myGameStatus = "<div style=\"color: green;\">In Progress...</div>";
+    	} else if (status.equals("O")) {
+    		myGameStatus = "Complete.";
+    	}
+    	
+    	return myGameStatus;
     }
 
     @RequestMapping(value="/play", method = RequestMethod.GET)

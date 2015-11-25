@@ -104,6 +104,17 @@ public class GameServiceImpl implements GameService {
 		
 		return playerGamesDto;
 	}
+
+	public String getGameStatusForPlayer(int playerId) {
+		String gameStatus = "";
+
+		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(playerId);
+
+		if(playerOpenGame != null) {
+			gameStatus = gameDao.findGameById(playerOpenGame.getGamePlayerKey().getGameId()).getStatus();
+		}
+		return gameStatus;
+	}
 	
 	public GameDto joinAGame(int playerId) {
 		GameDto gameDto = null;
