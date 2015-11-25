@@ -181,11 +181,12 @@ public class HeartsController {
 //        <c:when test="${game.gameStatus eq 'W'}"><div style="color: red;">Waiting for More Players...</div></c:when>
 //        <c:when test="${game.gameStatus eq 'G'}"><div style="color: green;">In Progress...</div></c:when>
 //        <c:when test="${game.gameStatus eq 'O'}">Complete.</c:when>
+    	//System.out.println("++++++++++++++++++++++++ Game Status = " + status);
     	if (status.equals("")) {
     		myGameStatus = "<div style=\"color: red;\">Determining Game Status...</div>";
     	} else if (status.equals("W")) {
     		myGameStatus = "<div style=\"color: red;\">Waiting for More Players...</div>";
-    	} else if (status.equals("G")) {
+    	} else if (status.equals("S")) {
     		myGameStatus = "<div style=\"color: green;\">In Progress...</div>";
     	} else if (status.equals("O")) {
     		myGameStatus = "Complete.";
