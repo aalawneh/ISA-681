@@ -24,13 +24,13 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
         	errMsg = "Passwords do not match";
         } if (isValidPlayerFirstName(uPlayer.getFirstName()) == 0) {
         	errMsg = "Invalid First Name.  <br>"
-        			+ "Only [a-zA-Z ] characters allowed, with a limit of 32 characters.";
+        			+ "Only [a-zA-Z ] characters allowed, with a limit of 1 to 32 characters.";
         } else if (isValidPlayerLastName(uPlayer.getLastName()) == 0) {
         	errMsg = "Invalid Last Name.  <br>"
-        			+ "Only [a-zA-Z '.] characters allowed, with a limit of 32 characters.";
+        			+ "Only [a-zA-Z '.] characters allowed, between 1 and 32 characters.";
         } else if (isValidPlayerSso(uPlayer.getSsoId()) == 0) {
         	errMsg = "Invalid SSO ID.  <br>"
-        			+ "Only alpha-numeric characters allowed, with a limit of 10 characters.";
+        			+ "Only alpha-numeric characters allowed, between 1 and 10 characters.";
         } else if (isMatchPlayerSso(uPlayer.getSsoId()) == 0) {
         	errMsg = "SSO ID already in use.";
         } else if (isValidPlayerPassword(uPlayer.getPassword()) == 0) {
@@ -41,10 +41,10 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
         			+ "3. at least 1 lower-case character, <br>"
         			+ "4. at least 1 special character (of @#$%^&+=), <br>"
         			+ "5. no white space.  <br>"
-        			+ "Password length must be between 12 and 32 characters.";
+        			+ "Password length must be between 12 to 32 characters.";
         } else if (isValidPlayerEmail(uPlayer.getEmail()) == 0) {
         	errMsg = "Invalid Email Address.  <br>"
-        			+ "Only valid email formats allowed, with a limit of 64 characters.";
+        			+ "Only valid email formats allowed, between 6 and 64 characters.";
         } else if (isMatchPlayerEmail(uPlayer.getEmail()) == 0) {
         	errMsg = "Email Address already in use.";
         }
@@ -59,7 +59,7 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
 	    
 	    Pattern pattern = Pattern.compile(expression);
 	    Matcher matcher = pattern.matcher(inputStr);
-	    if (name.length() <= 32 && matcher.find()) {
+	    if (name.length() >= 1 && name.length() <= 32 && matcher.find()) {
 	        isValid = 1;
 	    }
 	    return isValid;
@@ -72,7 +72,7 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
 	    
 	    Pattern pattern = Pattern.compile(expression);
 	    Matcher matcher = pattern.matcher(inputStr);
-	    if (name.length() <= 32 && matcher.find()) {
+	    if (name.length() >= 1 && name.length() <= 32 && matcher.find()) {
 	        isValid = 1;
 	    }
 	    return isValid;
@@ -85,7 +85,7 @@ public class UnregisteredPlayerServiceImpl implements UnregisteredPlayerService{
 	    
 	    Pattern pattern = Pattern.compile(expression);
 	    Matcher matcher = pattern.matcher(inputStr);
-	    if (sso.length() <= 10 && matcher.find()) {
+	    if (sso.length() >= 1 && sso.length() <= 10 && matcher.find()) {
 	        isValid = 1;
 	    }
 	    return isValid;
