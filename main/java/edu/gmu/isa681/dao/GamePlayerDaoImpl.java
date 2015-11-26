@@ -38,6 +38,27 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 		return playerGames;
 	}
 
+	public GamePlayer getPlayerInGame(int gameId, int playerId) {
+		
+		Criteria crit = getSession().createCriteria(GamePlayer.class)
+				.add(Restrictions.eq("gamePlayerKey.gameId", gameId))
+				.add(Restrictions.eq("gamePlayerKey.playerId", playerId));
+		GamePlayer results = (GamePlayer) crit.list().get(0);
+
+		return results;
+	}
+	
+	
+	public GamePlayer getPlayerPositionInGame(int gameId, int position) {
+		
+		Criteria crit = getSession().createCriteria(GamePlayer.class)
+				.add(Restrictions.eq("gamePlayerKey.gameId", gameId))
+				.add(Restrictions.eq("position", position));
+		GamePlayer results = (GamePlayer) crit.list().get(0);
+
+		return results;
+	}
+	
 	// Check if the player already in a game and the game is not over.
 	// select * from game_player pg, game g where g.game_id = pg.game_id and player_id = 2 and status != 'O'; -- OVER
 	@SuppressWarnings("unchecked")

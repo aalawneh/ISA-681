@@ -16,9 +16,12 @@ public class GameMove implements Serializable {
 	@EmbeddedId
     private GameMoveKey gameMoveKey;
 
-	@Column(name = "ROUND_ID", nullable = true, length = 1)
+	@Column(name = "round_id", nullable = true)
 	private Integer roundId;	
 	
+	@Column(name = "time_stamp", nullable = true)
+	private Integer timestamp;	
+
 	public GameMove() {
 		super();
 	}
@@ -74,6 +77,14 @@ public class GameMove implements Serializable {
 
 	public void setRoundId(Integer roundId) {
 		this.roundId = roundId;
+	}
+
+	public Integer getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Integer timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public static long getSerialversionuid() {

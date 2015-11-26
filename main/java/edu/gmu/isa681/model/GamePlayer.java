@@ -18,11 +18,11 @@ public class GamePlayer implements Serializable {
     private GamePlayerKey gamePlayerKey;
 
 	@NotNull
-	@Column(name = "POSITION", nullable = false)
+	@Column(name = "position", nullable = false)
 	private Integer position;
 
 	@NotNull
-	@Column(name = "SCORE", nullable = false)
+	@Column(name = "score", nullable = false)
 	private Integer score;
 	
 	public GamePlayer() {

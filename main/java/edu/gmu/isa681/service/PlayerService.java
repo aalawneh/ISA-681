@@ -9,6 +9,4 @@ public interface PlayerService {
 	public Player findPlayerById(int id);
 
 	public Player findBySso(String sso);
-	
-	public Player findByEmail(String email);
 }

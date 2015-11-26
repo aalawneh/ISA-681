@@ -10,6 +10,10 @@ public interface GamePlayerDao {
 
 	public List<GamePlayer> getPlayerGamesResults(int playerId);
 
+	public GamePlayer getPlayerInGame(int gameId, int playerId);
+
+	public GamePlayer getPlayerPositionInGame(int gameId, int position);
+
 	public GamePlayer getPlayerOpenGame(int playerId);
 
 	public List<Object[]> getOpenGame(int playerId);

@@ -13,6 +13,7 @@ import edu.gmu.isa681.dao.GameMoveDao;
 import edu.gmu.isa681.dao.GamePlayerDao;
 import edu.gmu.isa681.dao.PlayerDao;
 import edu.gmu.isa681.dto.GameDto;
+import edu.gmu.isa681.dto.GameMoveDto;
 import edu.gmu.isa681.dto.OpponentsDto;
 import edu.gmu.isa681.dto.PlayerGamesDto;
 import edu.gmu.isa681.model.Game;
@@ -24,7 +25,7 @@ import edu.gmu.isa681.model.GameStatus;
 import edu.gmu.isa681.model.Player;
 import edu.gmu.isa681.util.CardShuffler;
 
-@Service("GameService")
+@Service("gameService")
 @Transactional
 public class GameServiceImpl implements GameService {
 
@@ -104,7 +105,7 @@ public class GameServiceImpl implements GameService {
 		
 		return playerGamesDto;
 	}
-
+	
 	public String getGameStatusForPlayer(int playerId) {
 		String gameStatus = "";
 
@@ -114,7 +115,7 @@ public class GameServiceImpl implements GameService {
 			gameStatus = gameDao.findGameById(playerOpenGame.getGamePlayerKey().getGameId()).getStatus();
 		}
 		return gameStatus;
-	}
+	}	
 	
 	public GameDto joinAGame(int playerId) {
 		GameDto gameDto = null;
@@ -124,6 +125,8 @@ public class GameServiceImpl implements GameService {
 		
 		// 2. Else check if there is an open game then have him join the game and return GameDto.
 		GamePlayer gameToJoin = new GamePlayer();
+		
+		List<String> cardsInRound = null;
 
 		if(playerOpenGame == null) {
 			List<Object[]> openGame = gamePlayerDao.getOpenGame(playerId);
@@ -173,31 +176,6 @@ public class GameServiceImpl implements GameService {
 		        	Game currGame = gameDao.findGameById(currGameId.intValue());
 		        	currGame.setStatus(GameStatus.STARTED.getStatus());
 		        	gameDao.save(currGame);
-		        	
-		        	// if quorum = 4 - then we need to shuffle the card between the players for the first time
-		        	String[] cards = CardShuffler.shuffle();
-		        	
-		        	List<GamePlayer> playersInGame = gamePlayerDao.getPlayersInGame(currGameId.intValue());
-		        	
-		        	int start = 0, end = 13;
-		        	for(GamePlayer player : playersInGame) {
-		        		
-						System.out.println("+++++++++++++++++++++++++ cards for player id = " + player.getGamePlayerKey().getPlayerId());
-		        		for(int i = start; i < end; i++) {
-		        			System.out.println("+++++++++++++++++++++++++ cards for card id = " + cards[i]);
-				        	GameMoveKey gMoveKey = new GameMoveKey();
-				        	gMoveKey.setPlayerId(player.getGamePlayerKey().getPlayerId());
-				        	gMoveKey.setGameId(player.getGamePlayerKey().getGameId());
-				        	gMoveKey.setHandId(1); // it is the first hand
-				        	gMoveKey.setCardId(cards[i]);
-				        	GameMove gMove = new GameMove();
-				        	gMove.setGameMoveKey(gMoveKey); 
-				        	gameMoveDao.save(gMove);
-		        		}
-		        		
-		        		start = end;
-		        		end += 13;
-		        	}
 		        }
 			}
 		}
@@ -209,7 +187,6 @@ public class GameServiceImpl implements GameService {
 		if(gameToJoin != null) {
 			gameDto = new GameDto();
 			gameDto.setGameId(gameToJoin.getGamePlayerKey().getGameId());
-			gameDto.setGameStatus(gameDao.findGameById(gameDto.getGameId()).getStatus());
 			gameDto.setPlayerId(gameToJoin.getGamePlayerKey().getPlayerId());
 			gameDto.setPlayerPosition(gameToJoin.getPosition());
 			gameDto.setPlayerScore(gameToJoin.getScore());
@@ -234,46 +211,224 @@ public class GameServiceImpl implements GameService {
 			// get player cards
 			List<String> playerCards = gameMoveDao.getPlayerCards(gameDto.getPlayerId(), gameDto.getGameId());
 			
-			//if playerCards.size() == 0
+			int whoseTurnId = -1;
+			List<GamePlayer> playersInGame = gamePlayerDao.getPlayersInGame(gameToJoin.getGamePlayerKey().getGameId());
 			
-			gameDto.setPlayerCards(playerCards);
+			if (playersInGame != null && playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty())) {
+
+	        	String[] cards = CardShuffler.shuffle();
+
+	        	// what is the current hand?
+	        	Integer currHand = gameMoveDao.getCurrHand(gameToJoin.getGamePlayerKey().getGameId());
+	        	if(currHand == null) 
+	        		currHand = 1;
+	        	else
+	        		currHand += 1;
+
+	        	int start = 0, end = 13;
+	        	for(GamePlayer player : playersInGame) {
+	        		
+					System.out.println("+++++++++++++++++++++++++ cards for player id = " + player.getGamePlayerKey().getPlayerId());
+					List<String> tempPlayerCards = new ArrayList<String>();
+					for(int i = start; i < end; i++) {
+	        			System.out.println("+++++++++++++++++++++++++ cards for card id = " + cards[i]);
+			        	GameMoveKey gMoveKey = new GameMoveKey();
+			        	gMoveKey.setPlayerId(player.getGamePlayerKey().getPlayerId());
+			        	gMoveKey.setGameId(player.getGamePlayerKey().getGameId());
+			        	
+			        	gMoveKey.setHandId(currHand);  
+			        	gMoveKey.setCardId(cards[i]);
+			        	
+			        	if(CardShuffler.TWO_CLUBS.equals(cards[i])) {
+			        		whoseTurnId = player.getGamePlayerKey().getPlayerId();
+			        		//whoseTurnName = player.getGamePlayerKey().getPlayerId()Id();
+			        	}
+			        	
+			        	GameMove gMove = new GameMove();
+			        	gMove.setGameMoveKey(gMoveKey); 
+			        	gameMoveDao.save(gMove);
+			        	
+			        	tempPlayerCards.add(cards[i]);
+	        		}
+	        		
+	        		start = end;
+	        		end += 13;
+	        		
+	        		if(player.getGamePlayerKey().getPlayerId() == gameToJoin.getGamePlayerKey().getPlayerId()) {
+	        			playerCards.addAll(tempPlayerCards);
+	        		}
+	        	}
+	        	
+			}
+			
+			if(playersInGame != null && playersInGame.size() == 4 && whoseTurnId < 0) {
+				// We need to figure out whose playing next - based on max(roundId)
+				// else check to see who has the 2 clubs, if no player played in current round
+
+				playerCards = CardShuffler.sort(playerCards);
+				
+				cardsInRound = cardsInRound(gameToJoin.getGamePlayerKey().getGameId());
+
+				Integer currRound = currRound(gameToJoin.getGamePlayerKey().getGameId());
+				if(currRound == null) {
+					// then who has 2 clubs start first.
+					int currHand = gameMoveDao.getCurrHand(gameToJoin.getGamePlayerKey().getGameId());
+					whoseTurnId = gameMoveDao.whoHasTwoClubs(gameToJoin.getGamePlayerKey().getGameId(), currHand); 
+				}
+				else {
+					GamePlayer whoseNext = null;
+					List<Integer> playersInRound = playersInRound(gameToJoin.getGamePlayerKey().getGameId());
+					if(playersInRound.size() == 4) {
+						// who lost will be first						
+						
+						// therefore player at location i lost, then he get to start
+						int index = CardShuffler.loser(cardsInRound);
+						whoseTurnId = playersInRound.get(index);
+						System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW loser is " + whoseTurnId);
+					}
+					else {
+						int lastPrayerId = playersInRound.get(playersInRound.size()-1);
+						GamePlayer aPlayer = gamePlayerDao.getPlayerInGame(gameToJoin.getGamePlayerKey().getGameId(), lastPrayerId);
+						
+						if(aPlayer.getPosition() == 3) {
+							whoseNext = gamePlayerDao.getPlayerPositionInGame(gameToJoin.getGamePlayerKey().getGameId(), 0);
+						}
+						else {
+							whoseNext = gamePlayerDao.getPlayerPositionInGame(gameToJoin.getGamePlayerKey().getGameId(), aPlayer.getPosition()+1);
+						}
+						whoseTurnId = whoseNext.getGamePlayerKey().getPlayerId();
+					}
+				}						
+			}
+
+			if (whoseTurnId >= 0 ){		
+				gameDto.setPlayerCards(playerCards);
+				gameDto.setWhoseTurnId(whoseTurnId);
+				Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
+				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
+				gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
+				gameDto.setCardsInRound(cardsInRound);
+				gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
+			}
 		}
 		
 		return gameDto;
 	}
-
-	public void play(int playerId, int gameId, String cardId) {
-		// We need to change the status of the card 
-		// if round_id has some value then this indicate that the card has already been played in that round
+	
+	public Integer currRound(int gameId) {
 		
-		Integer currHand = gameMoveDao.getCurrHand(playerId, gameId);
 		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
 		
 		Integer currRound = null;
-		Integer playerCounter = null; // how many player played in this round so far not including the current player
-
-		for (Object[] item : result) {
-			currRound = ((BigInteger) item[0]).intValue();
-			playerCounter = ((BigInteger) item[1]).intValue();
-	    }		
-		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
-		System.out.println("+++++++++++++++++ playerCounter = " + playerCounter);
+	
+		for (Object[] tuple : result) {
+		    currRound = ((BigInteger)tuple[0]).intValue();
+		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       currRound = " + currRound);
+		}
 		
+		return currRound;
+    }		
+
+	public List<Integer> playersInRound(int gameId) {
+		
+		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
+		
+		List<Integer> totalPlayersInRound = new ArrayList<Integer>();
+		
+		for (Object[] tuple : result) {
+			totalPlayersInRound.add(((BigInteger)tuple[1]).intValue());
+		}
+		
+		for(Integer playerId : totalPlayersInRound)
+		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       playerId = " + playerId);
+
+		
+		return totalPlayersInRound;
+    }
+	
+	public List<String> cardsInRound(int gameId) {
+		
+		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
+		
+		List<String> cardsInRound = new ArrayList<String>();
+		
+		for (Object[] tuple : result) {
+			cardsInRound.add((String)tuple[2]);
+		}
+		
+		for(String card_id : cardsInRound)
+		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       cards_id = " + card_id);
+
+		
+		return cardsInRound;
+    }		
+
+	
+	public void play(int playerId, int gameId, String cardId) {
+		
+		
+		
+		// We need to change the status of the card 
+		// if round_id has some value then this indicate that the card has already been played in that round
+		
+		Integer currHand = gameMoveDao.getCurrHand(gameId);
+		Integer currRound = currRound(gameId);
+		List<Integer> playersInRound = playersInRound(gameId);
+	    int totalPlayersInRound = playersInRound.size();
+
+		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
+		
+
 		if(currRound == null) {
 			currRound = 1;
 		}
-		else if(playerCounter == 4) {
+		else if(totalPlayersInRound == 4) {
 			// everytime the current player count who played a round reaches 4 then start a new round
 			currRound += 1;
 		}
-		else if(playerCounter == 3) {
-			// this means that this player is going to play his card making a complete round
+		else if(totalPlayersInRound == 3) {
+			// this means that this player is going to play his card, making a complete round
 			// which means we are ready to calculate who lost.
 			
 			//TODO: calculate who lost in this block of code.
 			// check if the game is over too!!! when some has a score > 100
+			List<String> cardsInRound = cardsInRound(gameId);
+			int index = CardShuffler.loser(cardsInRound);
+			int loserId = playersInRound.get(index); // this is the loser's playerId 
+			
+			// now update the scores here 
+			
+			
+			// next check if the game is over and update the game status
 		}
 		
 		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);		
+	}
+	
+	public List<GameMoveDto> getGameMoves(int playerId) {
+		
+		List<GameMoveDto> gameMoves = new ArrayList<GameMoveDto>();		
+		
+		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(playerId);
+		int gameId = playerOpenGame.getGamePlayerKey().getGameId();
+		
+		List<Object[]> result = gameMoveDao.getGameMoves(gameId, GameStatus.STARTED.getStatus());
+	
+		for (Object[] tuple : result) {
+			GameMoveDto gameMoveDto = new GameMoveDto();
+			gameMoveDto.setPlayerName((String)tuple[0]);
+			gameMoveDto.setHandId(((BigInteger)tuple[1]).intValue());   
+			gameMoveDto.setCardId((String)tuple[2]);
+			gameMoveDto.setRoundId(((BigInteger)tuple[1]).intValue());
+			
+			gameMoves.add(gameMoveDto);
+		}
+		
+		return gameMoves;
+		
+	}
+	
+	public List<String> getPlayerCards(int playerId, int gameId) {
+		return gameMoveDao.getPlayerCards(playerId, gameId);
 	}
 }

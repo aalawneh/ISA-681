@@ -5,8 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Hearts Game Home Page</title>
-<link href="<c:url value='/static/css/bootstrap.css' />"
-	rel="stylesheet"></link>
+<link href="<c:url value='/static/css/bootstrap.css' />" rel="stylesheet"></link>
 <link href="<c:url value='/static/css/app.css' />" rel="stylesheet"></link>
 
 <style>
@@ -37,8 +36,13 @@ table#t01 {
 			</tr>
 		</table>
 		<br /> <br />
-		
-
+		<c:if test="${newPlayer eq 'Y' || newPlayer eq 'y'}">
+			<table style="width: 100% border: 0">
+				<tr>
+					<td align="left" colspan="3">Confirmation message : ${success}</td>
+   				</tr>
+   			</table>
+		</c:if>
 
 		<c:if test="${newPlayer ne 'Y' && newPlayer ne 'y'}">
 			<table style="width: 100%" class="bord">

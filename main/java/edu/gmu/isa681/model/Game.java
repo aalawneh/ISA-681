@@ -20,7 +20,7 @@ public class Game implements Serializable {
 	private int gameId;
 
 	@NotNull
-	@Column(name = "STATUS", nullable = false, length = 1)
+	@Column(name = "status", nullable = false, length = 1)
 	private String status = GameStatus.WAITING.getStatus();
 
 	public int getGameId() {

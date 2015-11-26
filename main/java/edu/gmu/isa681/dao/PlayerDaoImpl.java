@@ -1,7 +1,6 @@
 package edu.gmu.isa681.dao;
 
 import edu.gmu.isa681.model.Player;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -20,12 +19,6 @@ public class PlayerDaoImpl extends AbstractDao<Integer, Player> implements Playe
 	public Player findBySSO(String sso) {
 		Criteria crit = createEntityCriteria();
 		crit.add(Restrictions.eq("ssoId", sso));
-		return (Player) crit.uniqueResult();
-	}
-	
-	public Player findByEmail(String email) {
-		Criteria crit = createEntityCriteria();
-		crit.add(Restrictions.eqOrIsNull("email", email));
 		return (Player) crit.uniqueResult();
 	}
 

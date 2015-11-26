@@ -10,8 +10,6 @@ public interface PlayerDao {
 
 	public Player findBySSO(String sso);
 	
-	public Player findByEmail(String email);
-	
 	public Integer isAvailPlayerSSO(String sso);
 	
 	public Integer isAvailPlayerEmail(String email);

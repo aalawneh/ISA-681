@@ -12,11 +12,11 @@ public class GamePlayerKey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@NotNull
-	@Column(name = "GAME_ID", nullable = false)
+	@Column(name = "game_id", nullable = false)
 	private Integer gameId;
 
 	@NotNull
-	@Column(name = "PLAYER_ID", nullable = false)
+	@Column(name = "player_id", nullable = false)
 	private Integer playerId;
 
 	public Integer getPlayerId() {

@@ -16,18 +16,36 @@
 		<c:when test="${back ne 1 && quorum ne 0}">
 			<c:forEach var="item" items="${game.playerCards}">
 				<li>
-					<a class="card rank-<c:out value="${item}" />" href="<c:url value="/play?gameId=${game.gameId}&cardId='${item}'" />"> 
-						<c:choose>
-						    <c:when test="${fn:startsWith(item, '10')}">
-								<span class="rank"><c:out value="${fn:substring(item, 0, 2)}" /></span>
-								<span class="suit"><c:set var="end" value="${fn:length(item)}" />&<c:out value="${fn:substring(item, 3, end)}" />;</span>
-						    </c:when>
-						    <c:otherwise>
-								<span class="rank"><c:set var="caps" value="${fn:substring(item, 0, 1)}" /><c:out value="${fn:toUpperCase(caps)}" /></span>
-								<span class="suit"><c:set var="end" value="${fn:length(item)}" />&<c:out value="${fn:substring(item, 2, end)}" />;</span>
-						    </c:otherwise>
-						</c:choose>		
-					</a>
+					<c:choose>
+						<c:when test="${game.whoseTurnId == loggedInPlayerId}">
+							<a class="card rank-<c:out value="${item}" />" href="<c:url value="/play?gameId=${game.gameId}&cardId='${item}'" />">
+								<c:choose>
+								    <c:when test="${fn:startsWith(item, '10')}">
+										<span class="rank"><c:out value="${fn:substring(item, 0, 2)}" /></span>
+										<span class="suit"><c:set var="end" value="${fn:length(item)}" />&<c:out value="${fn:substring(item, 3, end)}" />;</span>
+								    </c:when>
+								    <c:otherwise>
+										<span class="rank"><c:set var="caps" value="${fn:substring(item, 0, 1)}" /><c:out value="${fn:toUpperCase(caps)}" /></span>
+										<span class="suit"><c:set var="end" value="${fn:length(item)}" />&<c:out value="${fn:substring(item, 2, end)}" />;</span>
+								    </c:otherwise>
+								</c:choose>		
+							</a>
+						</c:when>
+						<c:otherwise>
+							<label class="card rank-<c:out value="${item}" />" style="pointer-events: none;">
+								<c:choose>
+								    <c:when test="${fn:startsWith(item, '10')}">
+										<span class="rank"><c:out value="${fn:substring(item, 0, 2)}" /></span>
+										<span class="suit"><c:set var="end" value="${fn:length(item)}" />&<c:out value="${fn:substring(item, 3, end)}" />;</span>
+								    </c:when>
+								    <c:otherwise>
+										<span class="rank"><c:set var="caps" value="${fn:substring(item, 0, 1)}" /><c:out value="${fn:toUpperCase(caps)}" /></span>
+										<span class="suit"><c:set var="end" value="${fn:length(item)}" />&<c:out value="${fn:substring(item, 2, end)}" />;</span>
+								    </c:otherwise>
+								</c:choose>		
+							</label>
+						</c:otherwise>
+					</c:choose>
 				</li>
 			</c:forEach>
 		</c:when>

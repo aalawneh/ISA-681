@@ -14,31 +14,31 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class Player {
 
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="PLAYER_ID")
+	@Column(name="player_id")
 	private int playerId;
 
 	@NotEmpty
-	@Column(name="SSO_ID", unique=true, nullable=false)
+	@Column(name="sso_id", unique=true, nullable=false)
 	private String ssoId;
 	
 	@NotEmpty
-	@Column(name="PASSWORD", nullable=false)
+	@Column(name="password", nullable=false)
 	private String password;
 		
 	@NotEmpty
-	@Column(name="FIRST_NAME", nullable=false)
+	@Column(name="first_name", nullable=false)
 	private String firstName;
 
 	@NotEmpty
-	@Column(name="LAST_NAME", nullable=false)
+	@Column(name="last_name", nullable=false)
 	private String lastName;
 
 	@NotEmpty
-	@Column(name="EMAIL", nullable=false)
+	@Column(name="email", nullable=false)
 	private String email;
 
 	@NotEmpty
-	@Column(name="STATE", nullable=false)
+	@Column(name="state", nullable=false)
 	private String state=PlayerState.ACTIVE.getState();
 
 	public int getPlayerId() {

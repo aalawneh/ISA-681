@@ -11,8 +11,11 @@ public class GameDto {
 	private int playerScore;
 	private List<String> playerCards;
 	
+	private int whoseTurnId;
+	private String whoseTurnName;
 	private List<OpponentsDto> opponents;
 	private StringBuffer playersScores;
+	private List<String> cardsInRound; 
 	
 	public int getPlayerId() {
 		return playerId;
@@ -56,6 +59,18 @@ public class GameDto {
 	public void setPlayerCards(List<String> playerCards) {
 		this.playerCards = playerCards;
 	}
+	public int getWhoseTurnId() {
+		return whoseTurnId;
+	}
+	public void setWhoseTurnId(int whoseTurnId) {
+		this.whoseTurnId = whoseTurnId;
+	}
+	public String getWhoseTurnName() {
+		return whoseTurnName;
+	}
+	public void setWhoseTurnName(String whoseTurnName) {
+		this.whoseTurnName = whoseTurnName;
+	}
 	public List<OpponentsDto> getOpponents() {
 		return opponents;
 	}
@@ -67,5 +82,11 @@ public class GameDto {
 	}
 	public void setPlayersScores(StringBuffer playersScores) {
 		this.playersScores = playersScores;
+	}
+	public List<String> getCardsInRound() {
+		return cardsInRound;
+	}
+	public void setCardsInRound(List<String> cardsInRound) {
+		this.cardsInRound = cardsInRound;
 	}
 }
