@@ -308,9 +308,9 @@ public class GameServiceImpl implements GameService {
 				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
 				gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 				gameDto.setCardsInRound(cardsInRound);
-				gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
 			}
 		}
+		gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
 		
 		return gameDto;
 	}

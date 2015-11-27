@@ -39,24 +39,25 @@
 			});
 		//-->
 	</script>
+	
 	<style type="text/css"></style>
 	<style>
-	#table_wrapper{background:tomato;border:1px solid olive;float:left;}
-  #tbody{height:80px;overflow-y:auto;width:400px;background:yellow;}
-  table{border-collapse:collapse; width:100%;}
-  td{padding:1px 5px; /* pixels */
-      border-right:1px solid red; /* to avoid the hacks for the padding */
-      border-bottom:1px solid red;} 
-  .td1{width:100px;}
-  .td2{width:140px;}
-  .td3{border-right-width:0;} /* optional */
-	.td4{border-right-width:0;}
-	  #header{width:400px;background:DodgerBlue;border-bottom:1px solid black;}
-  	  #header div{padding:1px 5px;float:left;border-right:1px solid orange;}
-      #header #head1{width:100px;}  
-      #header #head2{width:140px;}  
-      #header #head3{float:none;border-right-width:0}
-      #header #head4{float:none;border-right-width:0}
+	    #table_wrapper{background:tomato;border:1px solid olive;float:left;}
+	    #tbody{height:100%;min-height: 100px;overflow-y:auto;width:100%;background:yellow;white-space:nowrap;}
+        table{border-collapse:collapse; width:100%;}
+        td{padding:1px 5px; /* pixels */
+        border-right:1px solid red; /* to avoid the hacks for the padding */
+        border-bottom:1px solid red;} 
+        .td1{width:25%;border-right:1px solid orange;}
+        .td2{width:25%;border-right:1px solid orange;}
+        .td3{width:25%;border-right:1px solid orange;} /* optional */
+	    .td4{border-right-width:0;}
+	    #header{width:100%;overflow-y:auto;overflow-x:hidden;background:DodgerBlue;border-bottom:1px solid black;white-space:nowrap;}
+  	    #header div{float:left;}
+        #header #head1{width:25%;border-right:1px solid orange;}  
+        #header #head2{width:25%;border-right:1px solid orange;}  
+        #header #head3{width:25%;border-right:1px solid orange;}
+        #header #head4{border-right-width:0;}
 	
 	table.bord, th.bord, td.bord {
 		border: 1px solid black;
@@ -81,11 +82,9 @@
 						<td>
 							<table border="0">
 								<tr>
-									<td align="left">
 										<a href="<c:url value="/home" />">Home</a>
 										&nbsp;&nbsp;&nbsp;
 										<a href="<c:url value="/logout" />">Logout</a>
-									</td>
 								</tr>
 							</table>
 						</td>									
@@ -124,48 +123,42 @@
 							</table>
 						</td>
 					</tr>
-					<tr><td></td></tr>
 					<tr>
-						<td>
-						
-<div id="table_wrapper">
-  <div id="header">
-    <div id="head1">Player</div>
-    <div id="head2">Hand</div>
-    <div id="head3">card</div>
-    <div id="head4">Round</div>
-  </div>
-  <div id="tbody">
-    <table>
-			<c:forEach var="item" items="${gameMoves}">
-				<tr>
-					<td class="td1" nowrap="nowrap"><c:out value="${item.playerName}"/></td>
-					<td class="td2"><c:out value="${item.handId}"/></td>
-					<td class="td3">
-						<label class="card rank-<c:out value="${item.cardId}" />" style="pointer-events: none;">
-							<c:choose>
-							    <c:when test="${fn:startsWith(item.cardId, '10')}">
-									<span class="rank"><c:out value="${fn:substring(item.cardId, 0, 2)}" /></span>
-									<span class="suit"><c:set var="end" value="${fn:length(item.cardId)}" />&<c:out value="${fn:substring(item.cardId, 3, end)}" />;</span>
-							    </c:when>
-							    <c:otherwise>
-									<span class="rank"><c:set var="caps" value="${fn:substring(item.cardId, 0, 1)}" /><c:out value="${fn:toUpperCase(caps)}" /></span>
-									<span class="suit"><c:set var="end" value="${fn:length(item.cardId)}" />&<c:out value="${fn:substring(item.cardId, 2, end)}" />;</span>
-							    </c:otherwise>
-							</c:choose>		
-						</label>
-					</td>
-					<td class="td4"><c:out value="${item.roundId}"/></td>
-				</tr>
-			</c:forEach>
-    </table>
-  </div>
-</div>				
-						
-						
-						
-
-						</td>
+					    <td>
+					        <div id="table_wrapper" style="width: 100%">
+                                <div id="header">
+                                    <div id="head1">Player</div>
+                                    <div id="head2">Hand</div>
+                                    <div id="head3">Card</div>
+                                    <div id="head4">Round</div>
+                                </div>
+                                <div id="tbody">
+                                    <table>
+			                            <c:forEach var="item" items="${gameMoves}">
+				                            <tr>
+					                            <td class="td1" nowrap="nowrap"><c:out value="${item.playerName}"/></td>
+					                            <td class="td2"><c:out value="${item.handId}"/></td>
+					                            <td class="td3">
+						                            <label class="card rank-<c:out value="${item.cardId}" />" style="pointer-events: none;">
+							                            <c:choose>
+							                                <c:when test="${fn:startsWith(item.cardId, '10')}">
+									                            <span class="rank"><c:out value="${fn:substring(item.cardId, 0, 2)}" /></span>
+									                            <span class="suit"><c:set var="end" value="${fn:length(item.cardId)}" />&<c:out value="${fn:substring(item.cardId, 3, end)}" />;</span>
+							                                </c:when>
+							                                <c:otherwise>
+									                            <span class="rank"><c:set var="caps" value="${fn:substring(item.cardId, 0, 1)}" /><c:out value="${fn:toUpperCase(caps)}" /></span>
+									                            <span class="suit"><c:set var="end" value="${fn:length(item.cardId)}" />&<c:out value="${fn:substring(item.cardId, 2, end)}" />;</span>
+							                                </c:otherwise>
+							                            </c:choose>		
+						                            </label>
+					                            </td>
+					                            <td class="td4"><c:out value="${item.roundId}"/></td>
+				                            </tr>
+			                            </c:forEach>
+                                    </table>
+                                </div>
+                            </div>
+					    </td>
 					</tr>
 				</table>			
 			</td>

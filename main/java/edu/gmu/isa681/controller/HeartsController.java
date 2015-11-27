@@ -212,6 +212,7 @@ public class HeartsController {
 
         model.addAttribute("oppSize", 4 - (game.getOpponents().size() + 1)); 
         model.addAttribute("game", game);
+        model.addAttribute("gameStatus", gameService.getGameStatusForPlayer(playerId));
         model.addAttribute("quorum", quorum);
         model.addAttribute("whoseTurnId", game.getWhoseTurnId());
 
