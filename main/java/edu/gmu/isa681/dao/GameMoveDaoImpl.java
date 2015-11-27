@@ -150,6 +150,13 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 
 		@SuppressWarnings("unchecked")
 		List<Object[]> result = (List<Object[]>) query.list();
+		
+		for(int i = 0; i < result.size(); i++) {
+		    System.out.println("###########name########## " + result.get(i)[0]);
+		    System.out.println("###########hand id########## " + result.get(i)[1]);
+		    System.out.println("###########card id########## " + result.get(i)[2]);
+		    System.out.println("###########round id########## " + result.get(i)[3]);
+		}
 				
 		return result;				
 	}

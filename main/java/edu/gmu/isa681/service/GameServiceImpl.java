@@ -421,7 +421,7 @@ public class GameServiceImpl implements GameService {
 			gameMoveDto.setPlayerName((String)tuple[0]);
 			gameMoveDto.setHandId(((BigInteger)tuple[1]).intValue());   
 			gameMoveDto.setCardId((String)tuple[2]);
-			gameMoveDto.setRoundId(((BigInteger)tuple[1]).intValue());
+			gameMoveDto.setRoundId(((BigInteger)tuple[3]).intValue());
 			
 			gameMoves.add(gameMoveDto);
 		}
