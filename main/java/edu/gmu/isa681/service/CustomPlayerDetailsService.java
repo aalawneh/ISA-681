@@ -33,6 +33,7 @@ public class CustomPlayerDetailsService implements UserDetailsService{
         AuthenticatedPlayer authPlayer = new AuthenticatedPlayer(player.getSsoId(), player.getPassword(), player.getState().equals("Active"), true, true, true, getGrantedAuthorities(player));
         authPlayer.setPlayerId(player.getPlayerId());
         authPlayer.setPlayerName(player.getFirstName() + " " + player.getLastName());
+        authPlayer.setPlayerSso(player.getSsoId());
         return authPlayer;		
 	}
 

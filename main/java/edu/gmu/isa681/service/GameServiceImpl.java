@@ -200,6 +200,7 @@ public class GameServiceImpl implements GameService {
 				System.out.println("++++++++++++++++++++++++++++++++++++++++++" + p.getLastName());
 				OpponentsDto dto = new OpponentsDto();
 				dto.setPlayerId(p.getPlayerId());
+				dto.setPlayerSso(p.getSsoId());
 				dto.setFirstName(p.getFirstName());
 				dto.setLastName(p.getLastName());
 				dto.setPosition(g.getPosition());		
@@ -306,7 +307,8 @@ public class GameServiceImpl implements GameService {
 				gameDto.setWhoseTurnId(whoseTurnId);
 				Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
 				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
-				gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
+				gameDto.setWhoseTurnName(whoseTurn.getSsoId());
+				//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 				gameDto.setCardsInRound(cardsInRound);
 			}
 		}

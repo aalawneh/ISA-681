@@ -202,7 +202,7 @@ public class HeartsController {
     	
     	GameDto game = gameService.joinAGame(playerId);
     	System.out.println("++++++++++++++++++++++++" + game.getPlayerId());
-        model.addAttribute("loggedInPlayerName", LoggedInPlayer.getLoggedInPlayerName());
+        model.addAttribute("loggedInPlayerSso", LoggedInPlayer.getLoggedInPlayerSso());
         model.addAttribute("loggedInPlayerId", LoggedInPlayer.getLoggedInPlayerId());
         // note: we have 4, so four minus how many already signed up for the game
         //       we also add one to count the current player ...

@@ -138,7 +138,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 	 *
 	 */
 	public List<Object[]> getGameMoves(int gameId, String gameStatus) {
-		String hql = " select CONCAT(first_name, ' ', last_name), hand_id, card_id, round_id "
+		String hql = " select sso_id, hand_id, card_id, round_id "
 				+ " from PLAYER p, GAME g, GAME_MOVE gm "
 				+ " where g.game_id = gm.game_id and p.player_id = gm.player_id "
 				+ " and g.game_id = :gameId and g.status = :gameStatus "

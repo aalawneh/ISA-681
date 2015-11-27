@@ -66,6 +66,7 @@
 	th.bord, td.bord {
 		padding: 5px;
 		text-align: left;
+		width: 25%;
 	}
 	table#t01 {
 		width: 100%;
@@ -101,11 +102,12 @@
 					</tr>
 					<tr>
 						<td>
+							Game ${game.gameId} Score: &nbsp;&nbsp;&nbsp;
 							<table style="width: 100%" class="bord">
 								<tr>
-									<th class="bord"><c:out value="${loggedInPlayerName}"/></th>
+									<th class="bord"><c:out value="${loggedInPlayerSso}"/></th>
 									<c:forEach var="item" items="${game.opponents}">
-										<th class="bord"><c:out value="${item.firstName} ${item.lastName}"/></th>
+										<th class="bord"><c:out value="${item.playerSso}"/></th>
 									</c:forEach>
 									<c:forEach begin="1" end="${oppSize}">
 										<th class="bord">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th> 
@@ -125,12 +127,13 @@
 					</tr>
 					<tr>
 					    <td>
+							Game ${game.gameId} History: &nbsp;&nbsp;&nbsp;
 					        <div id="table_wrapper" style="width: 100%">
                                 <div id="header">
                                     <div id="head1">Player</div>
                                     <div id="head2">Hand</div>
-                                    <div id="head3">Card</div>
-                                    <div id="head4">Round</div>
+                                    <div id="head3">Round</div>
+                                    <div id="head4">Card</div>
                                 </div>
                                 <div id="tbody">
                                     <table>
@@ -138,7 +141,8 @@
 				                            <tr>
 					                            <td class="td1" nowrap="nowrap"><c:out value="${item.playerName}"/></td>
 					                            <td class="td2"><c:out value="${item.handId}"/></td>
-					                            <td class="td3">
+					                            <td class="td3"><c:out value="${item.roundId}"/></td>
+					                            <td class="td4">
 						                            <label class="card rank-<c:out value="${item.cardId}" />" style="pointer-events: none;">
 							                            <c:choose>
 							                                <c:when test="${fn:startsWith(item.cardId, '10')}">
@@ -152,7 +156,6 @@
 							                            </c:choose>		
 						                            </label>
 					                            </td>
-					                            <td class="td4"><c:out value="${item.roundId}"/></td>
 				                            </tr>
 			                            </c:forEach>
                                     </table>
@@ -171,7 +174,7 @@
 							<td width="33%" height="3.6em;" nowrap="nowrap">
 								<c:choose>
 								    <c:when test="${game.playerPosition eq 0}">
-								       <c:out value="${loggedInPlayerName}"/>
+								       <c:out value="${loggedInPlayerSso}"/>
 									   		
 			<c:set var="back" scope="session" value="0"/>
 			<c:import url="/WEB-INF/views/cards.jsp"></c:import>
@@ -181,13 +184,13 @@
 								    <c:otherwise>
 										<c:choose>
 										    <c:when test="${game.opponents[0].position eq 0}">
-										       <c:out value="${game.opponents[0].firstName} ${game.opponents[0].lastName}"/>
+										       <c:out value="${game.opponents[0].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[1].position eq 0}">
-										       <c:out value="${game.opponents[1].firstName} ${game.opponents[1].lastName}"/>
+										       <c:out value="${game.opponents[1].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[2].position eq 0}">
-										       <c:out value="${game.opponents[2].firstName} ${game.opponents[2].lastName}"/>
+										       <c:out value="${game.opponents[2].playerSso}"/>
 										    </c:when>
 										</c:choose>					        
 			
@@ -205,7 +208,7 @@
 							<td>
 								<c:choose>
 								    <c:when test="${game.playerPosition eq 3}">
-								       <c:out value="${loggedInPlayerName}"/>
+								       <c:out value="${loggedInPlayerSso}"/>
 			
 			<c:set var="back" scope="session" value="0"/>
 			<c:import url="/WEB-INF/views/cards.jsp"></c:import>
@@ -215,13 +218,13 @@
 								    <c:otherwise>
 										<c:choose>
 										    <c:when test="${game.opponents[0].position eq 3}">
-										       <c:out value="${game.opponents[0].firstName} ${game.opponents[0].lastName}"/>
+										       <c:out value="${game.opponents[0].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[1].position eq 3}">
-										       <c:out value="${game.opponents[1].firstName} ${game.opponents[1].lastName}"/>
+										       <c:out value="${game.opponents[1].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[2].position eq 3}">
-										       <c:out value="${game.opponents[2].firstName} ${game.opponents[2].lastName}"/>
+										       <c:out value="${game.opponents[2].playerSso}"/>
 										    </c:when>
 										</c:choose>					        
 			
@@ -250,7 +253,7 @@
 							<td>
 								<c:choose>
 								    <c:when test="${game.playerPosition eq 1}">
-								       <c:out value="${loggedInPlayerName}"/>
+								       <c:out value="${loggedInPlayerSso}"/>
 								       
 			<c:set var="back" scope="session" value="0"/>
 			<c:import url="/WEB-INF/views/cards.jsp"></c:import>
@@ -259,13 +262,13 @@
 								    <c:otherwise>
 										<c:choose>
 										    <c:when test="${game.opponents[0].position eq 1}">
-										       <c:out value="${game.opponents[0].firstName} ${game.opponents[0].lastName}"/>
+										       <c:out value="${game.opponents[0].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[1].position eq 1}">
-										       <c:out value="${game.opponents[1].firstName} ${game.opponents[1].lastName}"/>
+										       <c:out value="${game.opponents[1].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[2].position eq 1}">
-										       <c:out value="${game.opponents[2].firstName} ${game.opponents[2].lastName}"/>
+										       <c:out value="${game.opponents[2].playerSso}"/>
 										    </c:when>
 										</c:choose>					        
 			
@@ -282,7 +285,7 @@
 							<td>
 								<c:choose>
 								    <c:when test="${game.playerPosition eq 2}">
-								       <c:out value="${loggedInPlayerName}"/>
+								       <c:out value="${loggedInPlayerSso}"/>
 			
 			<c:set var="back" scope="session" value="0"/>
 			<c:import url="/WEB-INF/views/cards.jsp"></c:import>
@@ -291,13 +294,13 @@
 								    <c:otherwise>
 										<c:choose>
 										    <c:when test="${game.opponents[0].position eq 2}">
-										       <c:out value="${game.opponents[0].firstName} ${game.opponents[0].lastName}"/>
+										       <c:out value="${game.opponents[0].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[1].position eq 2}">
-										       <c:out value="${game.opponents[1].firstName} ${game.opponents[1].lastName}"/>
+										       <c:out value="${game.opponents[1].playerSso}"/>
 										    </c:when>
 										    <c:when test="${game.opponents[2].position eq 2}">
-										       <c:out value="${game.opponents[2].firstName} ${game.opponents[2].lastName}"/>
+										       <c:out value="${game.opponents[2].playerSso}"/>
 										    </c:when>
 										</c:choose>					        
 			

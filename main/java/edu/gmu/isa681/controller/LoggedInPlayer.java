@@ -14,6 +14,10 @@ public class LoggedInPlayer {
 	    return getAuthenticatedPlayer().getPlayerName();
 	}
 
+	public static String getLoggedInPlayerSso() {
+	    return getAuthenticatedPlayer().getPlayerSso();
+	}
+
 	private static AuthenticatedPlayer getAuthenticatedPlayer() {
 	    return (AuthenticatedPlayer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}

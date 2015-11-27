@@ -3,7 +3,7 @@ package edu.gmu.isa681.dto;
 public class OpponentsDto {
 	
 	private int playerId;
-	private int playerSso;
+	private String playerSso;
 	private String firstName;
 	private String lastName;
 	private int position;
@@ -15,10 +15,10 @@ public class OpponentsDto {
 	public void setPlayerId(int playerId) {
 		this.playerId = playerId;
 	}
-	public int getPlayerSso() {
+	public String getPlayerSso() {
 		return playerSso;
 	}
-	public void setPlayerSso(int playerSso) {
+	public void setPlayerSso(String playerSso) {
 		this.playerSso = playerSso;
 	}
 	public String getFirstName() {

@@ -10,6 +10,7 @@ public class AuthenticatedPlayer extends org.springframework.security.core.userd
 
 	private int playerId;
 	private String playerName;
+	private String playerSso;
 
 	public int getPlayerId() {
 		return playerId;
@@ -26,6 +27,15 @@ public class AuthenticatedPlayer extends org.springframework.security.core.userd
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
 	}
+
+	public String getPlayerSso() {
+		return playerSso;
+	}
+
+	public void setPlayerSso(String playerSso) {
+		this.playerSso = playerSso;
+	}
+
 
 	public AuthenticatedPlayer(String username, String password, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities)
