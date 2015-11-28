@@ -315,7 +315,7 @@ public class GameServiceImpl implements GameService {
 				//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 				gameDto.setCardsInRound(cardsInRound);
 				if (twoofclubs == 1) {
-					gameDto.setGameMsg(whoseTurn.getSsoId() + " must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
+					gameDto.setGameMsg(whoseTurn.getSsoId() + ": must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
 				} else {
 					gameDto.setGameMsg(gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
 				}
@@ -379,7 +379,7 @@ public class GameServiceImpl implements GameService {
 		gamePlayerDao.updateGameMessage(playerId, gameId, gameMsg);
 	}
 
-	public void play(int playerId, int gameId, String cardId) {
+	public int play(int playerId, int gameId, String cardId) {
 				
 		// We need to change the status of the card 
 		// if round_id has some value then this indicate that the card has already been played in that round
@@ -388,23 +388,70 @@ public class GameServiceImpl implements GameService {
 		Integer currRound = currRound(gameId);
 		List<Integer> playersInRound = playersInRound(gameId);
 	    int totalPlayersInRound = playersInRound.size();
+	    List<GameMoveDto> gameMoves = getGameMoves(playerId);
+		Player p = playerDao.findPlayerById(playerId);
+		List<String> pCards = getPlayerCards(playerId,gameId);
+		List<String> cardsInRound = cardsInRound(gameId);
 
 		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
 		System.out.println("+++++++++++++++++ current card = " + cardId);
+		System.out.println("+++++++++++++++++ totalplayersinround = " + totalPlayersInRound);
 		
 		//validate card is in player's hand
 		//validate card has not yet been played
 		
-		//check card validity
 		if(currRound == null) {
+			//check card validity for first round
 			if (!cardId.equals("2 clubs")) {  //first card must be two clubs
-				return;
+				return -1;
 			}
-		} else if (totalPlayersInRound == 0) {
-			//cannot start with heart unless heart has been played
+		} else if (currRound == 1) {
+			//no player can play point card in first round
+			if (cardId.contains("hearts") || cardId.contains("q spades")){
+				gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot play point card in first round.");
+				return -1;
+			}
+		} else if (totalPlayersInRound == 4) {
+			//check card validity for first person in all other rounds
+			//cannot start with heart unless heart or queen of spades has been played
+			//however, queen of spades can be played at any time
+			if (cardId.contains("hearts")){
+				int hearts = 0;
+				for (int i = 0; i < gameMoves.size(); i++) {
+					if (gameMoves.get(i).getCardId().contains("hearts") || gameMoves.get(i).getCardId().contains("q spades")) {
+						hearts = 1;
+						i = gameMoves.size();
+					}
+				}
+				if (hearts == 0) {
+					gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot start with that card if no point cards have been played.");
+					return -1;
+				}
+			}
 		} else {
 			//must play same suit if player has it in their hand
+			System.out.println("+++++++++++++++++ cardsinround = " + cardsInRound);
+			//check if same suit as first card
+			//if not same suit, then ensure that player does not have a matching suit in their hand
+			if(!cardId.substring(cardId.lastIndexOf(" ") + 1).equals(cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1))){
+				int match = 0;
+				
+				for (int i = 0; i < pCards.size(); i++) {
+					if(pCards.get(i).substring(pCards.get(i).lastIndexOf(" ") + 1).equals(cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1))){
+						match = 1;
+						i = pCards.size();
+					}
+				}
+				
+				if (match == 1) {
+				    gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": must play suit: " + cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1));
+				    return -1;
+				}
+			}
+			
 		}
+		
+		//update round criteria and scoring
 		
 		//card is ok.  progress the round.
 		if(currRound == null) {
@@ -420,7 +467,6 @@ public class GameServiceImpl implements GameService {
 			
 			//TODO: calculate who lost in this block of code.
 			// check if the game is over too!!! when some has a score > 100
-			List<String> cardsInRound = cardsInRound(gameId);
 			int index = CardShuffler.loser(cardsInRound);
 			int loserId = playersInRound.get(index); // this is the loser's playerId 
 			
@@ -430,7 +476,8 @@ public class GameServiceImpl implements GameService {
 			// next check if the game is over and update the game status
 		}
 		
-		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);		
+		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);
+		return 0;
 	}
 	
 	public List<GameMoveDto> getGameMoves(int playerId) {

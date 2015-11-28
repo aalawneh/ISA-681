@@ -84,6 +84,8 @@
 						<td>
 							<table border="0">
 								<tr>
+										Welcome ${loggedInPlayerSso}!
+										&nbsp;&nbsp;&nbsp;
 										<a href="<c:url value="/home" />">Home</a>
 										&nbsp;&nbsp;&nbsp;
 										<a href="<c:url value="/logout" />">Logout</a>

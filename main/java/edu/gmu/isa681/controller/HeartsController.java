@@ -218,6 +218,7 @@ public class HeartsController {
     	
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
     	int whoseTurnId;
+    	int ret;
     	
     	GameDto game = gameService.joinAGame(playerId);
     	
@@ -251,7 +252,7 @@ public class HeartsController {
 		
 		if (found==1) {
 	    	//player has the card.	    	
-	    	gameService.play(playerId, gameBoard.getGameId(), gameBoard.getCardId());
+	    	ret = gameService.play(playerId, gameBoard.getGameId(), gameBoard.getCardId());
 			System.out.println("+++++++++++++++++++++++++ board POST play = VALID CARD " + gameBoard.getCardId());
 		} else {
 			//notify users and prevent card from being played.
@@ -262,8 +263,9 @@ public class HeartsController {
             model.addAttribute("gameBoard", gameBoard);
 	    	return board(model);
 		}
-
-		gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
+        if (ret == 0) {
+		    gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
+        }
     	return board(model);
     }
 }

@@ -150,8 +150,8 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 
 		Criteria crit = getSession().createCriteria(GamePlayer.class)
 				.setProjection(Projections.property("messages"))
-				.add(Restrictions.eq("gamePlayerKey.gameId", gameId))
-				.add(Restrictions.ne("gamePlayerKey.playerId", playerId));
+				.add(Restrictions.eq("gamePlayerKey.gameId", gameId));
+				//.add(Restrictions.ne("gamePlayerKey.playerId", playerId));
 		List<String> results = (List<String>) crit.list();
 	    System.out.println("++++++++++++++++ in getGameMessage method: all results " + results);
 		

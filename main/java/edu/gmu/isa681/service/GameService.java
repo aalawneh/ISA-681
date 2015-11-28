@@ -14,7 +14,7 @@ public interface GameService {
 		
 	public String getGameStatusForPlayer(int playerId);
 	
-	public void play(int playerId, int gameId, String cardId);
+	public int play(int playerId, int gameId, String cardId);
 	
 	public void setCheaterMsg(int playerId, int gameId, String gameMsg);
 	
