@@ -372,7 +372,12 @@ public class GameServiceImpl implements GameService {
 		}
 		
 		return cardsInRound;
-    }		
+    }
+	
+	public void setCheaterMsg(int playerId, int gameId, String gameMsg) {
+
+
+	}
 
 	public void play(int playerId, int gameId, String cardId) {
 				
@@ -453,5 +458,6 @@ public class GameServiceImpl implements GameService {
 	
 	public List<String> getPlayerCards(int playerId, int gameId) {
 		return gameMoveDao.getPlayerCards(playerId, gameId);
-	}
+	}	
+	
 }

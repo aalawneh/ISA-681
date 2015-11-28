@@ -40,6 +40,7 @@ create table GAME_PLAYER (
    player_id BIGINT NOT NULL,
    position BIGINT NOT NULL,
    score BIGINT DEFAULT 0,
+   messages VARCHAR(1024),
    PRIMARY KEY (game_id, player_id),
    CONSTRAINT fk_pg_player FOREIGN KEY (player_id) REFERENCES PLAYER (player_id),
    CONSTRAINT fk_pg_game FOREIGN KEY (game_id) REFERENCES GAME (game_id)

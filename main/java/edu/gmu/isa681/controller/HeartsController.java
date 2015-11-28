@@ -230,11 +230,27 @@ public class HeartsController {
     	 * before we call play method in the service
     	 */
     	
-    	//List<String> playerCards = gameService.getPlayerCards(playerId, gameBoard.getGameId());
+    	List<String> playerCards = gameService.getPlayerCards(playerId, gameBoard.getGameId());
+    	int found = 0;
     	
-    	//loop through the list to make sure he has the card if he does not then error otherwise you call play method.
-    	
-    	//gameService.play(playerId, gameBoard.getGameId(), cardId);
+		for (int i = 0; i < playerCards.size(); i++) {
+			if (playerCards.get(i).equals(gameBoard.getCardId())) {
+				found=1;
+				i=playerCards.size();
+			}
+		}
+		
+		if (found==1) {
+	    	//loop through the list to make sure he has the card if he does not then error otherwise you call play method.
+	    	
+	    	//gameService.play(playerId, gameBoard.getGameId(), cardId);
+			System.out.println("+++++++++++++++++++++++++ board POST play = VALID CARD");
+		} else {
+			String cheat = "";
+			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
+		}
+
+		
     	
     	return board(model);
     }

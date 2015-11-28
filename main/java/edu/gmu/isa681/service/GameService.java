@@ -16,6 +16,8 @@ public interface GameService {
 	
 	public void play(int playerId, int gameId, String cardId);
 	
+	public void setCheaterMsg(int playerId, int gameId, String gameMsg);
+	
 	public List<GameMoveDto> getGameMoves(int playerId);
 	
 	public List<String> getPlayerCards(int playerId, int gameId);

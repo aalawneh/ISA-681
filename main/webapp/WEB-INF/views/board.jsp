@@ -331,6 +331,7 @@
         //From: http://stackoverflow.com/questions/13380346/is-it-possible-to-have-a-spring-model-object-as-the-value-of-spring-form
         //$('#theForm').attr("action","play?cardId=\'"+cardId+"\'");
         
+        //From: http://stackoverflow.com/questions/6912197/change-value-of-input-then-submit-form-in-javascript
         document.forms["cardForm"].cardId.value = "\'" + cardId + "\'";
         document.forms["cardForm"].submit();
     }
