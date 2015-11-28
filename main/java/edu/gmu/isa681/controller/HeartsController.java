@@ -207,7 +207,7 @@ public class HeartsController {
         return "board";
     }
 
-    @RequestMapping(value = "/play", method = RequestMethod.POST)
+    @RequestMapping(value = "/board", method = RequestMethod.POST)
     public String play(@Valid GameBoard gameBoard, 
     		           BindingResult result, ModelMap model) {
     	
@@ -226,6 +226,7 @@ public class HeartsController {
     		gameBoard.setCardId("");
             model.addAttribute("gameBoard", gameBoard);
 			System.out.println("+++++++++++++++++++++++++ board POST play = NOT YOUR TURN " + playerId);
+			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), LoggedInPlayer.getLoggedInPlayerSso() + " tried to play when it is not their turn.");
     		return board(model);
     	}
     	
@@ -254,11 +255,15 @@ public class HeartsController {
 			System.out.println("+++++++++++++++++++++++++ board POST play = VALID CARD " + gameBoard.getCardId());
 		} else {
 			//notify users and prevent card from being played.
-			String cheat = "Did not submit a valid card from their hand.";
+			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " did not submit a valid card from their hand.";
 			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
 			System.out.println("+++++++++++++++++++++++++ board POST play = INVALID CARD " + gameBoard.getCardId());
+    		gameBoard.setCardId("");
+            model.addAttribute("gameBoard", gameBoard);
+	    	return board(model);
 		}
 
+		gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
     	return board(model);
     }
 }

@@ -144,14 +144,29 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 	public String getGameMessage(int playerId, int gameId) {
 		System.out.println("++++++++++++++++ in getGameMessage method");
 		System.out.println(gameId);
+		
+		String result = "";
+		int newline = 0;
 
 		Criteria crit = getSession().createCriteria(GamePlayer.class)
 				.setProjection(Projections.property("messages"))
 				.add(Restrictions.eq("gamePlayerKey.gameId", gameId))
 				.add(Restrictions.ne("gamePlayerKey.playerId", playerId));
-		String results = (String) crit.list().get(0);
-
-		return results;		
+		List<String> results = (List<String>) crit.list();
+	    System.out.println("++++++++++++++++ in getGameMessage method: all results " + results);
+		
+		for (int i = 0; i < results.size(); i++) {
+		    if (results.get(i) != null && !results.get(i).isEmpty()){
+		    	if (newline == 1) {
+		    		result = result.concat("<br>");
+		    	}
+			    System.out.println("++++++++++++++++ in getGameMessage method: results " + i + ": " + results.get(i));
+		    	result = result.concat(results.get(i)); 
+		    	newline=1;
+		    }
+		}
+	    System.out.println("++++++++++++++++ in getGameMessage method: results: " + result);
+		return result;		
 	}
 
 	public void updateGameMessage(int playerId, int gameId, String message) {
@@ -162,7 +177,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
         System.out.println("+++++++++++++++++++++++++ message = " + message);
 
         String hql = "update GamePlayer gamePlayer "
-                + " set gamePlayer.message = :message "
+                + " set gamePlayer.messages = :message "
                 + " where gamePlayer.gamePlayerKey.playerId = :playerId "
                 + " and gamePlayer.gamePlayerKey.gameId = :gameId ";
        

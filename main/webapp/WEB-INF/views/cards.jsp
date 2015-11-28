@@ -57,7 +57,7 @@
 				</li>
 			</c:forEach>
 		    <c:if test="${game.whoseTurnId == loggedInPlayerId}">
-			    <form method="POST" id="theForm" action="play" modelAttribute="gameBoard" name="cardForm" >
+			    <form method="POST" id="theForm" action="board" modelAttribute="gameBoard" name="cardForm" >
 			        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 			        <input type="hidden" name="gameId" value="${game.gameId}"/>
 			        <input type="hidden" name="cardId" value=""/>

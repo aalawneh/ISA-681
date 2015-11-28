@@ -315,14 +315,12 @@ public class GameServiceImpl implements GameService {
 				//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 				gameDto.setCardsInRound(cardsInRound);
 				if (twoofclubs == 1) {
-					gameDto.setGameMsg(whoseTurn.getSsoId() + " must start the game with the two of clubs.");
+					gameDto.setGameMsg(whoseTurn.getSsoId() + " must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
 				} else {
-					gameDto.setGameMsg("");
+					gameDto.setGameMsg(gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
 				}
 			}
 			
-			// get cheating messages
-			gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId());
 		}
 		gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
 		
