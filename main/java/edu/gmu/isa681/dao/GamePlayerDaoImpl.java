@@ -117,6 +117,28 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 
 		return results;
 	}
+	
+    public void updatePlayerScore(int playerId, int gameId, int score) {
+
+        System.out.println("++++++++++++++++ in updatePlayerScore method");
+
+        System.out.println("+++++++++++++++++++++++++ playerId = " + playerId);
+        System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
+
+        String hql = "update GamePlayer gamePlayer "
+                + " set gamePlayer.score = :score "
+                + " where gamePlayer.gamePlayerKey.playerId = :playerId "
+                + " and gamePlayer.gamePlayerKey.gameId = :gameId ";
+       
+        Query query = getSession().createQuery(hql)
+                .setInteger("score", new Integer(score))
+                .setInteger("playerId", new Integer(playerId))
+                .setInteger("gameId", new Integer(gameId));
+
+        int result = query.executeUpdate();
+       
+        System.out.println("Rows affected: " + result);       
+    }    
 }
 
 /*

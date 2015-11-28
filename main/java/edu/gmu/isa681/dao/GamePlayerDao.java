@@ -21,4 +21,7 @@ public interface GamePlayerDao {
 	public List<GamePlayer> getOpponentsInGame(int gameId, int playerId);
 	
 	public List<GamePlayer> getPlayersInGame(int gameId);
+	
+	public void updatePlayerScore(int playerId, int gameId, int score);
+	
 }
