@@ -24,16 +24,20 @@ public class GamePlayer implements Serializable {
 	@NotNull
 	@Column(name = "score", nullable = false)
 	private Integer score;
+
+	@Column(name = "messages", nullable = true)
+	private String messages;
 	
 	public GamePlayer() {
 		super();
 	}
 	
-	public GamePlayer(GamePlayerKey gamePlayerKey, Integer position, Integer score) {
+	public GamePlayer(GamePlayerKey gamePlayerKey, Integer position, Integer score, String messages) {
 		super();
 		this.gamePlayerKey = gamePlayerKey;
 		this.position = position;
 		this.score = score;
+		this.messages = messages;
 	}
 
 	public GamePlayerKey getGamePlayerKey() {
@@ -60,6 +64,14 @@ public class GamePlayer implements Serializable {
 		this.score = score;
 	}
 
+	public String getMessages() {
+		return messages;
+	}
+
+	public void setMessages(String messages) {
+		this.messages = messages;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -71,6 +83,7 @@ public class GamePlayer implements Serializable {
 		result = prime * result + ((gamePlayerKey == null) ? 0 : gamePlayerKey.hashCode());
 		result = prime * result + ((position == null) ? 0 : position.hashCode());
 		result = prime * result + ((score == null) ? 0 : score.hashCode());
+		result = prime * result + ((messages == null) ? 0 : messages.hashCode());
 		return result;
 	}
 
@@ -98,14 +111,19 @@ public class GamePlayer implements Serializable {
 				return false;
 		} else if (!score.equals(other.score))
 			return false;
+		if (messages == null) {
+			if (other.messages != null)
+				return false;
+		} else if (!messages.equals(other.messages))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "GamePlayer [gamePlayerKey=" + gamePlayerKey + ", position=" + position + ", score=" + score
+		return "GamePlayer [gamePlayerKey=" + gamePlayerKey + ", position=" + position + ", score=" + score + ", messages=" + messages
 				+ ", getGamePlayerKey()=" + getGamePlayerKey() + ", getPosition()=" + getPosition() + ", getScore()="
-				+ getScore() + ", hashCode()=" + hashCode() + ", getClass()=" + getClass() + ", toString()="
+				+ getScore() + ", getMessages()=" + getMessages()  + ", hashCode()=" + hashCode() + ", getClass()=" + getClass() + ", toString()="
 				+ super.toString() + "]";
 	}
 

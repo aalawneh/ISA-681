@@ -24,4 +24,7 @@ public interface GamePlayerDao {
 	
 	public void updatePlayerScore(int playerId, int gameId, int score);
 	
+	public String getGameMessage(int playerId, int gameId);
+
+	public void updateGameMessage(int playerId, int gameId, String message);
 }

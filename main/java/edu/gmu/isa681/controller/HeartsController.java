@@ -217,6 +217,17 @@ public class HeartsController {
         }
     	
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
+    	int whoseTurnId;
+    	
+    	GameDto game = gameService.joinAGame(playerId);
+    	
+    	if (playerId != game.getWhoseTurnId()) {
+    		//we don't accept submissions if it is not your turn.
+    		gameBoard.setCardId("");
+            model.addAttribute("gameBoard", gameBoard);
+			System.out.println("+++++++++++++++++++++++++ board POST play = NOT YOUR TURN " + playerId);
+    		return board(model);
+    	}
     	
     	// First mark the card that it has been used
 		System.out.println("+++++++++++++++++++++++++ board POST play = " + playerId);
@@ -226,13 +237,10 @@ public class HeartsController {
     	gameBoard.setCardId(gameBoard.getCardId().replaceAll("'", ""));
     	System.out.println("+++++++++++++++++++++++++ cardId = " + gameBoard.getCardId());
     	
-    	/*
-    	 * before we call play method in the service
-    	 */
-    	
     	List<String> playerCards = gameService.getPlayerCards(playerId, gameBoard.getGameId());
     	int found = 0;
     	
+    	//loop through the list to determine if the player has the card
 		for (int i = 0; i < playerCards.size(); i++) {
 			if (playerCards.get(i).equals(gameBoard.getCardId())) {
 				found=1;
@@ -241,17 +249,16 @@ public class HeartsController {
 		}
 		
 		if (found==1) {
-	    	//loop through the list to make sure he has the card if he does not then error otherwise you call play method.
-	    	
-	    	//gameService.play(playerId, gameBoard.getGameId(), cardId);
-			System.out.println("+++++++++++++++++++++++++ board POST play = VALID CARD");
+	    	//player has the card.	    	
+	    	gameService.play(playerId, gameBoard.getGameId(), gameBoard.getCardId());
+			System.out.println("+++++++++++++++++++++++++ board POST play = VALID CARD " + gameBoard.getCardId());
 		} else {
-			String cheat = "";
+			//notify users and prevent card from being played.
+			String cheat = "Did not submit a valid card from their hand.";
 			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
+			System.out.println("+++++++++++++++++++++++++ board POST play = INVALID CARD " + gameBoard.getCardId());
 		}
 
-		
-    	
     	return board(model);
     }
 }

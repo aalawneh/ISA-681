@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -138,7 +139,42 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
         int result = query.executeUpdate();
        
         System.out.println("Rows affected: " + result);       
-    }    
+    }
+
+	public String getGameMessage(int playerId, int gameId) {
+		System.out.println("++++++++++++++++ in getGameMessage method");
+		System.out.println(gameId);
+
+		Criteria crit = getSession().createCriteria(GamePlayer.class)
+				.setProjection(Projections.property("messages"))
+				.add(Restrictions.eq("gamePlayerKey.gameId", gameId))
+				.add(Restrictions.ne("gamePlayerKey.playerId", playerId));
+		String results = (String) crit.list().get(0);
+
+		return results;		
+	}
+
+	public void updateGameMessage(int playerId, int gameId, String message) {
+        System.out.println("++++++++++++++++ in updateGameMessage method");
+
+        System.out.println("+++++++++++++++++++++++++ playerId = " + playerId);
+        System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
+        System.out.println("+++++++++++++++++++++++++ message = " + message);
+
+        String hql = "update GamePlayer gamePlayer "
+                + " set gamePlayer.message = :message "
+                + " where gamePlayer.gamePlayerKey.playerId = :playerId "
+                + " and gamePlayer.gamePlayerKey.gameId = :gameId ";
+       
+        Query query = getSession().createQuery(hql)
+                .setString("message", message)
+                .setInteger("playerId", new Integer(playerId))
+                .setInteger("gameId", new Integer(gameId));
+
+        int result = query.executeUpdate();
+       
+        System.out.println("Rows affected: " + result); 		
+	}    
 }
 
 /*

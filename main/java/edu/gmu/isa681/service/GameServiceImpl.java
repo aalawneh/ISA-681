@@ -320,6 +320,9 @@ public class GameServiceImpl implements GameService {
 					gameDto.setGameMsg("");
 				}
 			}
+			
+			// get cheating messages
+			gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId());
 		}
 		gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
 		
@@ -375,8 +378,7 @@ public class GameServiceImpl implements GameService {
     }
 	
 	public void setCheaterMsg(int playerId, int gameId, String gameMsg) {
-
-
+		gamePlayerDao.updateGameMessage(playerId, gameId, gameMsg);
 	}
 
 	public void play(int playerId, int gameId, String cardId) {
@@ -459,5 +461,4 @@ public class GameServiceImpl implements GameService {
 	public List<String> getPlayerCards(int playerId, int gameId) {
 		return gameMoveDao.getPlayerCards(playerId, gameId);
 	}	
-	
 }
