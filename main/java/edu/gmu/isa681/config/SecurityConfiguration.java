@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -50,9 +51,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 * (non-Javadoc)
 	 * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
 	 * 
-	 * The configuration says that URL’s ‘/’ & ‘/home’ are not secured, anyone can access them. 
-	 * URL ‘/admin/**’ can only be accessed by someone who have ADMIN role. 
-	 * URL ‘/db/**’ can only be accessed by someone who have both ADMIN and DBA roles.
+	 * The configuration says that URLï¿½s ï¿½/ï¿½ & ï¿½/homeï¿½ are not secured, anyone can access them. 
+	 * URL ï¿½/admin/**ï¿½ can only be accessed by someone who have ADMIN role. 
+	 * URL ï¿½/db/**ï¿½ can only be accessed by someone who have both ADMIN and DBA roles.
 	 * 
 	 * Method formLogin provides support for form based authentication and will generate a default form asking for player credentials. 
 	 * You are allowed to configure your own login form. We will see examples for the same in subsequent posts.

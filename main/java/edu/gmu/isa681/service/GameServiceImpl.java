@@ -127,6 +127,8 @@ public class GameServiceImpl implements GameService {
 		GamePlayer gameToJoin = new GamePlayer();
 		
 		List<String> cardsInRound = null;
+		
+		int twoofclubs = 0;
 
 		if(playerOpenGame == null) {
 			List<Object[]> openGame = gamePlayerDao.getOpenGame(playerId);
@@ -274,10 +276,12 @@ public class GameServiceImpl implements GameService {
 				if(currRound == null) {
 					// then who has 2 clubs start first.
 					int currHand = gameMoveDao.getCurrHand(gameToJoin.getGamePlayerKey().getGameId());
-					whoseTurnId = gameMoveDao.whoHasTwoClubs(gameToJoin.getGamePlayerKey().getGameId(), currHand); 
+					whoseTurnId = gameMoveDao.whoHasTwoClubs(gameToJoin.getGamePlayerKey().getGameId(), currHand);
+					twoofclubs=1;
 				}
 				else {
 					GamePlayer whoseNext = null;
+					twoofclubs=0;
 					List<Integer> playersInRound = playersInRound(gameToJoin.getGamePlayerKey().getGameId());
 					if(playersInRound.size() == 4) {
 						// who lost will be first						
@@ -310,6 +314,11 @@ public class GameServiceImpl implements GameService {
 				gameDto.setWhoseTurnName(whoseTurn.getSsoId());
 				//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 				gameDto.setCardsInRound(cardsInRound);
+				if (twoofclubs == 1) {
+					gameDto.setGameMsg(whoseTurn.getSsoId() + " must start the game with the two of clubs.");
+				} else {
+					gameDto.setGameMsg("");
+				}
 			}
 		}
 		gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
@@ -341,9 +350,9 @@ public class GameServiceImpl implements GameService {
 			totalPlayersInRound.add(((BigInteger)tuple[1]).intValue());
 		}
 		
-		for(Integer playerId : totalPlayersInRound)
+		for(Integer playerId : totalPlayersInRound) {
 		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       playerId = " + playerId);
-
+		}
 		
 		return totalPlayersInRound;
     }
@@ -358,18 +367,15 @@ public class GameServiceImpl implements GameService {
 			cardsInRound.add((String)tuple[2]);
 		}
 		
-		for(String card_id : cardsInRound)
+		for(String card_id : cardsInRound) {
 		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       cards_id = " + card_id);
-
+		}
 		
 		return cardsInRound;
     }		
 
-	
 	public void play(int playerId, int gameId, String cardId) {
-		
-		
-		
+				
 		// We need to change the status of the card 
 		// if round_id has some value then this indicate that the card has already been played in that round
 		
@@ -379,8 +385,23 @@ public class GameServiceImpl implements GameService {
 	    int totalPlayersInRound = playersInRound.size();
 
 		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
+		System.out.println("+++++++++++++++++ current card = " + cardId);
 		
-
+		//validate card is in player's hand
+		//validate card has not yet been played
+		
+		//check card validity
+		if(currRound == null) {
+			if (!cardId.equals("2 clubs")) {  //first card must be two clubs
+				return;
+			}
+		} else if (totalPlayersInRound == 0) {
+			//cannot start with heart unless heart has been played
+		} else {
+			//must play same suit if player has it in their hand
+		}
+		
+		//card is ok.  progress the round.
 		if(currRound == null) {
 			currRound = 1;
 		}

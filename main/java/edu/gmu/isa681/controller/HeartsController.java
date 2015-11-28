@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -34,9 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import edu.gmu.isa681.model.Player;
 import edu.gmu.isa681.model.UnregisteredPlayer;
+import edu.gmu.isa681.model.GameBoard;
 import edu.gmu.isa681.dto.GameDto;
 import edu.gmu.isa681.dto.GameMoveDto;
 import edu.gmu.isa681.dto.PlayerGamesDto;
@@ -60,6 +63,12 @@ public class HeartsController {
     public String sayHello(ModelMap model) {
         return "welcome";
     }
+    
+    @RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
+    public String sayStop(ModelMap model) {
+        return "accessdenied";
+    }
+    
  
     /*
      * 13-Nov-2015 17:39:05.211 WARNING [http-nio-8010-exec-2] org.springframework.web.servlet.PageNotFound.handleHttpRequestMethodNotSupported Request method 'POST' not supported
@@ -107,31 +116,6 @@ public class HeartsController {
         model.addAttribute("player", uPlayer);
         return "register";
     }
-
-    @RequestMapping(value="/currgamestatus", method = RequestMethod.GET)
-    public @ResponseBody String gameStatus(ModelMap model) {
-    	String myGameStatus = "";
-    	String status = "";
-    	int playerId = LoggedInPlayer.getLoggedInPlayerId();
-    	
-    	status = gameService.getGameStatusForPlayer(playerId);
-
-//        <c:when test="${game.gameStatus eq 'W'}"><div style="color: red;">Waiting for More Players...</div></c:when>
-//        <c:when test="${game.gameStatus eq 'G'}"><div style="color: green;">In Progress...</div></c:when>
-//        <c:when test="${game.gameStatus eq 'O'}">Complete.</c:when>
-    	//System.out.println("++++++++++++++++++++++++ Game Status = " + status);
-    	if (status.equals("")) {
-    		myGameStatus = "<div style=\"color: red;\">Determining Game Status...</div>";
-    	} else if (status.equals("W")) {
-    		myGameStatus = "<div style=\"color: red;\">Waiting for More Players...</div>";
-    	} else if (status.equals("S")) {
-    		myGameStatus = "<div style=\"color: green;\">In Progress...</div>";
-    	} else if (status.equals("O")) {
-    		myGameStatus = "Complete.";
-    	}
-    	
-    	return myGameStatus;
-    }
     
     /*
      * This method will be called on form submission, handling POST request It
@@ -174,8 +158,6 @@ public class HeartsController {
         model.addAttribute("success", "Player " + player.getSsoId() + " has been registered successfully.");
         model.addAttribute("newPlayer", "Y");
         
-        
-        
 /*        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uPlayer.getSsoId(), uPlayer.getPassword());
 
         // generate session if one doesn't exist
@@ -185,9 +167,7 @@ public class HeartsController {
         Authentication authenticatedUser = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authenticatedUser);        
 */
-        
-        
-        
+                
         return "home";
     }
     
@@ -209,9 +189,14 @@ public class HeartsController {
         int numOfPlayersInGame = game.getOpponents().size() + 1; // 1 for the current player
     	System.out.println("++++++++++++++++++++++++ numOfPlayersInGame = " + numOfPlayersInGame);
         int quorum = (4 - numOfPlayersInGame) == 0 ? 1 : 0;
+        
+        GameBoard gameBoard = new GameBoard();
+        
+        gameBoard.setGameId(game.getGameId());
 
         model.addAttribute("oppSize", 4 - (game.getOpponents().size() + 1)); 
         model.addAttribute("game", game);
+        model.addAttribute("gameBoard", gameBoard);
         model.addAttribute("gameStatus", gameService.getGameStatusForPlayer(playerId));
         model.addAttribute("quorum", quorum);
         model.addAttribute("whoseTurnId", game.getWhoseTurnId());
@@ -222,30 +207,35 @@ public class HeartsController {
         return "board";
     }
 
-    @RequestMapping(value="/play", method = RequestMethod.GET)
-    public String play(@RequestParam(value="gameId", required=true) int gameId, 
-    		           @RequestParam(value="cardId", required=true) String cardId, 
-    		           ModelMap model) {
+    @RequestMapping(value = "/play", method = RequestMethod.POST)
+    public String play(@Valid GameBoard gameBoard, 
+    		           BindingResult result, ModelMap model) {
+    	
+        if (result.hasErrors()) {
+            System.out.println("There are errors");
+            return "board";
+        }
     	
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
     	
     	// First mark the card that it has been used
+		System.out.println("+++++++++++++++++++++++++ board POST play = " + playerId);
     	System.out.println("+++++++++++++++++++++++++ playerId = " + playerId);
-    	System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
-    	System.out.println("+++++++++++++++++++++++++ cardId = " + cardId);
-    	cardId = cardId.replaceAll("'", "");
-    	System.out.println("+++++++++++++++++++++++++ cardId = " + cardId);
+    	System.out.println("+++++++++++++++++++++++++ gameboard.gameId = " + gameBoard.getGameId());
+    	System.out.println("+++++++++++++++++++++++++ gameboard.cardId = " + gameBoard.getCardId());
+    	gameBoard.setCardId(gameBoard.getCardId().replaceAll("'", ""));
+    	System.out.println("+++++++++++++++++++++++++ cardId = " + gameBoard.getCardId());
     	
     	/*
     	 * before we call play method in the service
     	 */
     	
-    	List<String> playerCards = gameService.getPlayerCards(playerId, gameId);
+    	//List<String> playerCards = gameService.getPlayerCards(playerId, gameBoard.getGameId());
     	
     	//loop through the list to make sure he has the card if he does not then error otherwise you call play method.
     	
-    	gameService.play(playerId, gameId, cardId);
+    	//gameService.play(playerId, gameBoard.getGameId(), cardId);
     	
-        return board(model);
+    	return board(model);
     }
 }

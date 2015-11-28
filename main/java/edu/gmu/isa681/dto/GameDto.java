@@ -6,6 +6,7 @@ public class GameDto {
 	private int playerId;
 	private int gameId;
 	private String gameStatus;
+	private String gameMsg;
 	private int playerPosition;
 	private String playerWon;
 	private int playerScore;
@@ -28,6 +29,12 @@ public class GameDto {
 	}
 	public void setGameId(int gameId) {
 		this.gameId = gameId;
+	}
+	public String getGameMsg() {
+		return gameMsg;
+	}
+	public void setGameMsg(String gameMsg) {
+		this.gameMsg = gameMsg;
 	}
 	public String getGameStatus() {
 		return gameStatus;

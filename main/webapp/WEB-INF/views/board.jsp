@@ -40,6 +40,7 @@
 		//-->
 	</script>
 	
+	
 	<style type="text/css"></style>
 	<style>
 	    #table_wrapper{background:tomato;border:1px solid olive;float:left;}
@@ -170,7 +171,10 @@
 				<div class="playingCards fourColours">
 					<table border="0" width="100%">
 						<tr valign="top">
-							<td width="33%" height="3.6em;" nowrap="nowrap" align="left">Player's turn: <c:out value="${game.whoseTurnName}"/></td>
+							<td width="33%" height="3.6em;" nowrap="nowrap" align="left">
+							    Player's turn: <c:out value="${game.whoseTurnName}"/> <br>
+							    ${game.gameMsg} 
+							</td>
 							<td width="33%" height="3.6em;" nowrap="nowrap">
 								<c:choose>
 								    <c:when test="${game.playerPosition eq 0}">
@@ -319,5 +323,17 @@
 			</td>
 		</tr>
 	</table>
+	
+	
+	<script type="text/javascript">
+    function submitCard(cardId)
+    {
+        //From: http://stackoverflow.com/questions/13380346/is-it-possible-to-have-a-spring-model-object-as-the-value-of-spring-form
+        //$('#theForm').attr("action","play?cardId=\'"+cardId+"\'");
+        
+        document.forms["cardForm"].cardId.value = "\'" + cardId + "\'";
+        document.forms["cardForm"].submit();
+    }
+    </script>
 </body>
 </html>
