@@ -176,8 +176,7 @@ public class PlayingCardDealer {
 		
 		for(int i=0; i<cardsList.size(); i++) {
 			if (cardsList.get(i).contains("hearts")) {
-				String [] num = cardsList.get(i).split(" ");
-				points += Integer.parseInt(num[0]);
+				points += 1;
 			} else if (cardsList.get(i).contains("q spades")) {
 			    points += 13;	
 			}
