@@ -15,8 +15,10 @@ public interface GameMoveDao {
 	public Integer getCurrHand(int gameId);
 	
 	public List<Object[]> getCurrRound(int gameId);
+
+	public List<Object[]> getRoundById(int gameId, int roundId);
 	
 	public void updateCardStatus(int playerId, int gameId, int handId, String cardId, int roundId);
-	
+
 	public List<Object[]> getGameMoves(int gameId, String gameStatus);
 }

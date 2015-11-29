@@ -21,4 +21,6 @@ public interface GameService {
 	public List<GameMoveDto> getGameMoves(int playerId);
 	
 	public List<String> getPlayerCards(int playerId, int gameId);
+	
+	public void updateScores(int gameId);
 }

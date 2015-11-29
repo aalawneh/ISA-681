@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class CardShuffler {
+public class PlayingCardDealer {
 	
 	public static final String TWO_CLUBS = "2 clubs";
 	
@@ -18,10 +18,10 @@ public class CardShuffler {
 		
 		
 		String[] suit = new String[4];
-		suit[0] = CardShuffler.HEARTS;  
-		suit[1] = CardShuffler.SPADES;  
-		suit[2] = CardShuffler.DIAMS;  
-		suit[3] = CardShuffler.CLUBS;  
+		suit[0] = PlayingCardDealer.HEARTS;  
+		suit[1] = PlayingCardDealer.SPADES;  
+		suit[2] = PlayingCardDealer.DIAMS;  
+		suit[3] = PlayingCardDealer.CLUBS;  
 		Collections.shuffle(Arrays.asList(suit));
 		//System.out.println(Arrays.toString(suit));
 		
@@ -94,7 +94,7 @@ public class CardShuffler {
 		//System.out.println(Arrays.toString(cards));
 		return cards;
 	}
-
+	
 	public static int compare(String s1, String s2) {
 		StringTokenizer st1 = new StringTokenizer(s1," ");  
 		StringTokenizer st2 = new StringTokenizer(s2," ");
@@ -171,6 +171,21 @@ public class CardShuffler {
 		return loserIndex;
 	}
 	
+	public static int loserPoints(List<String> cardsList) {
+		int points = 0;
+		
+		for(int i=0; i<cardsList.size(); i++) {
+			if (cardsList.get(i).contains("hearts")) {
+				String [] num = cardsList.get(i).split(" ");
+				points += Integer.parseInt(num[0]);
+			} else if (cardsList.get(i).contains("q spades")) {
+			    points += 13;	
+			}
+		}
+		
+		return points;
+	}
+	
 	public static List<String> sort(List<String> playerCardsList) {
 		
 		String[] playerCards = new String[playerCardsList.size()];
@@ -219,12 +234,12 @@ public class CardShuffler {
 				"7 diams", "8 hearts", "a clubs", "a spades", "k clubs", "k hearts", "q hearts", "q spades"};
 		
 		List<String> playerCardsList = Arrays.asList(cards);
-		playerCardsList = CardShuffler.sort(playerCardsList);
+		playerCardsList = PlayingCardDealer.sort(playerCardsList);
 		
 		System.out.println(playerCardsList);
 */		
 		String[] loserCards = {"a clubs", "7 clubs", "k hearts", "6 clubs"};
-		int l = CardShuffler.loser(Arrays.asList(loserCards));
+		int l = PlayingCardDealer.loser(Arrays.asList(loserCards));
 		System.out.println(l);
 
 		//String[] cards = shuffle();

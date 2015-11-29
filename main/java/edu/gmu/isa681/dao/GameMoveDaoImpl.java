@@ -10,7 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import edu.gmu.isa681.model.GameMove;
-import edu.gmu.isa681.util.CardShuffler;
+import edu.gmu.isa681.util.PlayingCardDealer;
 
 @Repository("gameMoveDao")
 public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements GameMoveDao {
@@ -45,7 +45,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 				.setProjection(Projections.property("gameMoveKey.playerId"))
 				.add(Restrictions.eq("gameMoveKey.gameId", gameId))
 				.add(Restrictions.eq("gameMoveKey.handId", handId))
-				.add(Restrictions.eq("gameMoveKey.cardId", CardShuffler.TWO_CLUBS))
+				.add(Restrictions.eq("gameMoveKey.cardId", PlayingCardDealer.TWO_CLUBS))
 				.add(Restrictions.isNull("roundId"));
 
 		Integer playerId = (Integer) crit.list().get(0);
@@ -101,6 +101,22 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 				
 		return result;		
 	}
+
+    public List<Object[]> getRoundById(int gameId, int roundId) {
+        String hql = " select player_id, card_id from GAME_MOVE "
+                + " where game_id = :gameId"
+                + " and hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) "
+                + " and round_id = :roundId "
+                + " order by time_stamp";
+        Query query = getSession().createSQLQuery(hql);
+        query.setInteger("gameId", new Integer(gameId))
+             .setInteger("roundId", new Integer(roundId));
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> result = (List<Object[]>) query.list();
+                
+        return result;    
+    }    
 	
 	public void updateCardStatus(int playerId, int gameId, int handId, String cardId, int roundId) {
 
@@ -160,4 +176,6 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 				
 		return result;				
 	}
+	
+	
 }

@@ -23,7 +23,7 @@ import edu.gmu.isa681.model.GamePlayer;
 import edu.gmu.isa681.model.GamePlayerKey;
 import edu.gmu.isa681.model.GameStatus;
 import edu.gmu.isa681.model.Player;
-import edu.gmu.isa681.util.CardShuffler;
+import edu.gmu.isa681.util.PlayingCardDealer;
 
 @Service("gameService")
 @Transactional
@@ -217,9 +217,24 @@ public class GameServiceImpl implements GameService {
 			int whoseTurnId = -1;
 			List<GamePlayer> playersInGame = gamePlayerDao.getPlayersInGame(gameToJoin.getGamePlayerKey().getGameId());
 			
-			if (playersInGame != null && playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty())) {
+            // pre check to determine that all other players have no cards left.           
+            boolean shuffle = true;
+            for(int i = 0; i < playersInGame.size(); i++) {
+                GamePlayer aPlayer = (GamePlayer) playersInGame.get(i);
+                int aPlayerId = aPlayer.getGamePlayerKey().getPlayerId();
+                if(aPlayerId != gameDto.getPlayerId()) {
+                    List<String> aPlayerCards = gameMoveDao.getPlayerCards(aPlayerId, gameDto.getGameId());
+                    if(aPlayerCards != null && !aPlayerCards.isEmpty()) {
+                        shuffle = false;
+                    }
+                }               
+            }
+           
+            if (playersInGame != null && playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty()) && shuffle && getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()) != "O") {
+				
+				updateScores(gameToJoin.getGamePlayerKey().getGameId());
 
-	        	String[] cards = CardShuffler.shuffle();
+	        	String[] cards = PlayingCardDealer.shuffle();
 
 	        	// what is the current hand?
 	        	Integer currHand = gameMoveDao.getCurrHand(gameToJoin.getGamePlayerKey().getGameId());
@@ -242,7 +257,7 @@ public class GameServiceImpl implements GameService {
 			        	gMoveKey.setHandId(currHand);  
 			        	gMoveKey.setCardId(cards[i]);
 			        	
-			        	if(CardShuffler.TWO_CLUBS.equals(cards[i])) {
+			        	if(PlayingCardDealer.TWO_CLUBS.equals(cards[i])) {
 			        		whoseTurnId = player.getGamePlayerKey().getPlayerId();
 			        		//whoseTurnName = player.getGamePlayerKey().getPlayerId()Id();
 			        	}
@@ -264,13 +279,13 @@ public class GameServiceImpl implements GameService {
 	        	
 			}
 			
-			if(playersInGame != null && playersInGame.size() == 4 && whoseTurnId < 0) {
+			if(playersInGame != null && playersInGame.size() == 4 && whoseTurnId < 0 && getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()) != "O") {
 				// We need to figure out whose playing next - based on max(roundId)
 				// else check to see who has the 2 clubs, if no player played in current round
 
-				playerCards = CardShuffler.sort(playerCards);
+				playerCards = PlayingCardDealer.sort(playerCards);
 				
-				cardsInRound = cardsInRound(gameToJoin.getGamePlayerKey().getGameId());
+				cardsInRound = cardsInCurrRound(gameToJoin.getGamePlayerKey().getGameId());
 
 				Integer currRound = currRound(gameToJoin.getGamePlayerKey().getGameId());
 				if(currRound == null) {
@@ -287,7 +302,7 @@ public class GameServiceImpl implements GameService {
 						// who lost will be first						
 						
 						// therefore player at location i lost, then he get to start
-						int index = CardShuffler.loser(cardsInRound);
+						int index = PlayingCardDealer.loser(cardsInRound);
 						whoseTurnId = playersInRound.get(index);
 						System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW loser is " + whoseTurnId);
 					}
@@ -358,9 +373,26 @@ public class GameServiceImpl implements GameService {
 		return totalPlayersInRound;
     }
 	
-	public List<String> cardsInRound(int gameId) {
+	public List<String> cardsInCurrRound(int gameId) {
 		
 		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
+		
+		List<String> cardsInRound = new ArrayList<String>();
+		
+		for (Object[] tuple : result) {
+			cardsInRound.add((String)tuple[2]);
+		}
+		
+		for(String card_id : cardsInRound) {
+		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       cards_id = " + card_id);
+		}
+		
+		return cardsInRound;
+    }
+
+	public List<String> cardsInRoundById(int gameId, int roundId) {
+		
+		List<Object[]> result = gameMoveDao.getRoundById(gameId, roundId);
 		
 		List<String> cardsInRound = new ArrayList<String>();
 		
@@ -391,7 +423,7 @@ public class GameServiceImpl implements GameService {
 	    List<GameMoveDto> gameMoves = getGameMoves(playerId);
 		Player p = playerDao.findPlayerById(playerId);
 		List<String> pCards = getPlayerCards(playerId,gameId);
-		List<String> cardsInRound = cardsInRound(gameId);
+		List<String> cardsInRound = cardsInCurrRound(gameId);
 
 		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
 		System.out.println("+++++++++++++++++ current card = " + cardId);
@@ -432,10 +464,10 @@ public class GameServiceImpl implements GameService {
 			//must play same suit if player has it in their hand
 			System.out.println("+++++++++++++++++ cardsinround = " + cardsInRound);
 			//check if same suit as first card
-			//if not same suit, then ensure that player does not have a matching suit in their hand
 			if(!cardId.substring(cardId.lastIndexOf(" ") + 1).equals(cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1))){
 				int match = 0;
-				
+
+				//if not same suit, then ensure that player does not have a matching suit in their hand
 				for (int i = 0; i < pCards.size(); i++) {
 					if(pCards.get(i).substring(pCards.get(i).lastIndexOf(" ") + 1).equals(cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1))){
 						match = 1;
@@ -443,15 +475,15 @@ public class GameServiceImpl implements GameService {
 					}
 				}
 				
+				//prevent player from using card
 				if (match == 1) {
 				    gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": must play suit: " + cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1));
 				    return -1;
 				}
 			}
-			
 		}
 		
-		//update round criteria and scoring
+		//update round criteria
 		
 		//card is ok.  progress the round.
 		if(currRound == null) {
@@ -460,23 +492,23 @@ public class GameServiceImpl implements GameService {
 		else if(totalPlayersInRound == 4) {
 			// everytime the current player count who played a round reaches 4 then start a new round
 			currRound += 1;
-		}
-		else if(totalPlayersInRound == 3) {
-			// this means that this player is going to play his card, making a complete round
-			// which means we are ready to calculate who lost.
-			
-			//TODO: calculate who lost in this block of code.
-			// check if the game is over too!!! when some has a score > 100
-			int index = CardShuffler.loser(cardsInRound);
-			int loserId = playersInRound.get(index); // this is the loser's playerId 
-			
-			// now update the scores here 
-			
-			
-			// next check if the game is over and update the game status
+		} //TODO: Add TOCTOU Game Status for Checking Score
+
+		//play card
+		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);
+		
+		//update round criteria
+		playersInRound = playersInRound(gameId);
+		totalPlayersInRound = playersInRound.size();
+		
+		//determine if hand is over
+		if (currRound == 13 && totalPlayersInRound == 4) {
+			//calculate scores and start new hand
+			updateScores(gameId);
 		}
 		
-		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);
+		//TODO: check if game is complete and change game status.  if game not complete, set it back to "started"
+		
 		return 0;
 	}
 	
@@ -506,4 +538,69 @@ public class GameServiceImpl implements GameService {
 	public List<String> getPlayerCards(int playerId, int gameId) {
 		return gameMoveDao.getPlayerCards(playerId, gameId);
 	}	
+	
+	public void updateScores(int gameId) {
+
+    	Integer currRound = currRound(gameId);
+		List<String> cardsInRound; 
+		int totalPlayersInRound;
+		List<Integer> players;
+		List<Integer> scoresForPlayers = new ArrayList<Integer>();
+		int loser;
+		int loserPoints;
+		
+		scoresForPlayers.add(0);
+		scoresForPlayers.add(0);
+		scoresForPlayers.add(0);
+		scoresForPlayers.add(0);
+    	
+    	if (currRound == 13) {
+    		//check to see if everyone has played
+    		players = playersInRound(gameId);
+    	    totalPlayersInRound = players.size();
+    	    if (totalPlayersInRound == 4) {
+    		
+	    		//for each player, calculate the score
+	    		for (int i = 1; i <= 13; i++) {
+	    			cardsInRound = cardsInRoundById(gameId,i);
+	    			loser = PlayingCardDealer.loser(cardsInRound);
+	    			for (int j = 0; j < totalPlayersInRound; j++) {
+	    				if (loser == players.get(j)) {
+	    				    loserPoints = scoresForPlayers.get(j) + PlayingCardDealer.loserPoints(cardsInRound);
+	    				    scoresForPlayers.set(j, loserPoints);
+	    				}
+	    			}
+	    		}
+	    		
+	    		//if one player has 26, then subtract 26 from their score and add 26 to everyone elses
+	    		for (int i = 0; i < totalPlayersInRound; i++) {
+	    			if (scoresForPlayers.get(i) == 26) {
+	    				Player p = playerDao.findPlayerById(scoresForPlayers.get(i));
+	    				gamePlayerDao.updateGameMessage(scoresForPlayers.get(i), gameId, p.getSsoId() + ": RAN THE TABLE!!");
+	    				for (int j = 0; j < totalPlayersInRound; j++) {
+	    					if (i == j) {
+		    				    scoresForPlayers.set(j, 0);
+	    					} else {
+		    				    scoresForPlayers.set(j, 26);	    						
+	    					}
+	    				}
+	    				//break out of loop if we found 26
+	    				i = totalPlayersInRound;  
+	    			}
+	    		}
+	    		
+	    		for (int i = 0; i < totalPlayersInRound; i++) {
+		    		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(players.get(i));
+		    		//add scores to current values
+		    		loserPoints = scoresForPlayers.get(i) + playerOpenGame.getScore();
+		    		//update scores in gamePlayerDao
+	    			gamePlayerDao.updatePlayerScore(players.get(i), gameId, loserPoints);
+		    		gamePlayerDao.save(playerOpenGame);
+	    		}
+	    		
+	    		//check to see if anyone's total score is >= 100, if so end game
+    	    }
+    	}
+    	
+	}
 }
