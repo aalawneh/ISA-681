@@ -436,6 +436,7 @@ public class GameServiceImpl implements GameService {
 		List<String> pCards = getPlayerCards(playerId,gameId);
 		List<String> cardsInRound = cardsInCurrRound(gameId);
 
+		System.out.println("+++++++++++++++++ PLAY FUNCTION ");
 		System.out.println("+++++++++++++++++ current roundId = " + currRound + " for handId = " + currHand + " and gameId = " + gameId);
 		System.out.println("+++++++++++++++++ current card = " + cardId);
 		System.out.println("+++++++++++++++++ totalplayersinround = " + totalPlayersInRound);
@@ -448,32 +449,7 @@ public class GameServiceImpl implements GameService {
 			if (!cardId.equals("2 clubs")) {  //first card must be two clubs
 				return -1;
 			}
-		} else if (currRound == 1) {
-			//no player can play point card in first round
-			if (cardId.contains("hearts") || cardId.contains("q spades")){
-				gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot play point card in first round.");
-				return -1;
-			}
-		} 
-		
-		if (totalPlayersInRound == 4) {
-			//check card validity for first person in all other rounds
-			//cannot start with heart unless heart or queen of spades has been played
-			//however, queen of spades can be played at any time
-			if (cardId.contains("hearts")){
-				int hearts = 0;
-				for (int i = 0; i < gameMoves.size(); i++) {
-					if (gameMoves.get(i).getCardId().contains("hearts") || gameMoves.get(i).getCardId().contains("q spades")) {
-						hearts = 1;
-						i = gameMoves.size();
-					}
-				}
-				if (hearts == 0) {
-					gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot start with that card if no point cards have been played.");
-					return -1;
-				}
-			}
-		}  else {		
+		} else if (totalPlayersInRound != 4) {			
 			//must play same suit if player has it in their hand
 			System.out.println("+++++++++++++++++ cardsinround = " + cardsInRound);
 			//check if same suit as first card
@@ -493,8 +469,31 @@ public class GameServiceImpl implements GameService {
 				    gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": must play suit: " + cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1));
 				    return -1;
 				}
+			}			
+			
+			//if the player doesnt have clubs, no player can play point card in first round
+			if ((currRound == 1) && (cardId.contains("hearts") || cardId.contains("q spades"))){
+				gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot play point card in first round.");
+				return -1;
 			}
-		}
+		} else if (totalPlayersInRound == 4) {
+			//check card validity for first person in all other rounds
+			//cannot start with heart unless heart or queen of spades has been played
+			//however, queen of spades can be played at any time
+			if (cardId.contains("hearts")){
+				int hearts = 0;
+				for (int i = 0; i < gameMoves.size(); i++) {
+					if (gameMoves.get(i).getCardId().contains("hearts") || gameMoves.get(i).getCardId().contains("q spades")) {
+						hearts = 1;
+						i = gameMoves.size();
+					}
+				}
+				if (hearts == 0) {
+					gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot start with that card if no point cards have been played.");
+					return -1;
+				}
+			}
+		}  
 		
 		//update round criteria
 		
@@ -512,6 +511,7 @@ public class GameServiceImpl implements GameService {
         	Game currGame = gameDao.findGameById(gameId);
         	currGame.setStatus(GameStatus.CALCULATING.getStatus());
         	gameDao.save(currGame);			
+			System.out.println("+++++++++++++++++ Setting Game Status to Calculating = " + currGame.getStatus());
 		}
 
 		//play card
