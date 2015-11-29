@@ -88,16 +88,39 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 	public List<Object[]> getCurrRound(int gameId) {
 		System.out.println("++++++++++++++++ in getCurrRound method");
     	System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
-    	
-		String hql = " select round_id, player_id, card_id from GAME_MOVE where "
-				+ " game_id = :gameId and "
-				+ " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) and "
-				+ " round_id = (select max(round_id) "
-				+ " from GAME_MOVE where game_id = :gameId and "
-				+ " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) "
-				+ " group by round_id having count(player_id) <= 4)"
-				+ " order by time_stamp";
 
+// Matt's failed attempt
+//		String hql = " select round_id, player_id, card_id from GAME_MOVE where "
+//				+ " game_id = :gameId and "
+//				+ " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) and "
+//				+ " round_id = (select max(round_id) "
+//				+ " from GAME_MOVE where game_id = :gameId and "
+//				+ " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) "
+//				+ " group by round_id having count(player_id) <= 4)"
+//				+ " order by time_stamp";
+    	
+//    	select * from GAME_MOVE
+//    	where game_id = 1
+//    	and   hand_id = (select max(hand_id) from GAME_MOVE where game_id = 1)
+//    	and   round_id = (select round_id
+//    	                  from   GAME_MOVE
+//    	                        where  game_id = 1
+//    	                        and    hand_id = (select max(hand_id) from GAME_MOVE where game_id = 1)
+//    	                        and    round_id =(select max(round_id) from GAME_MOVE where game_id = 1 and hand_id = (select max(hand_id) from GAME_MOVE where game_id = 1))
+//    	                        group by round_id
+//    	                        having count(player_id) <= 4)
+//    	order by time_stamp;
+
+        String hql = " select round_id, player_id, card_id from GAME_MOVE where "
+                + " game_id = :gameId and "
+                + " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) and "
+                + " round_id =  (select round_id "
+                + " from GAME_MOVE where game_id = :gameId and "
+                + " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId) and "
+                + " round_id = (select max(round_id) from GAME_MOVE where game_id = :gameId and "
+                + " hand_id = (select max(hand_id) from GAME_MOVE where game_id = :gameId)) "
+                + " group by round_id having count(player_id) <= 4)"
+                + " order by time_stamp";
 		
 // Original query.  Produces errors when multiple hands in game.
 //		String hql = " select round_id, player_id, card_id from GAME_MOVE where round_id = "
@@ -111,10 +134,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
     	System.out.println("+++++++++++++++++++++++++ query = " + hql);
 		
 		Query query = getSession().createSQLQuery(hql);
-		query.setInteger("gameId", new Integer(gameId))
-		     .setInteger("gameId", new Integer(gameId))
-		     .setInteger("gameId", new Integer(gameId))
-		     .setInteger("gameId", new Integer(gameId));
+		query.setInteger("gameId", new Integer(gameId));
 
 		@SuppressWarnings("unchecked")
 		List<Object[]> result = (List<Object[]>) query.list();
@@ -185,7 +205,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 				+ " where g.game_id = gm.game_id and p.player_id = gm.player_id "
 				+ " and g.game_id = :gameId and g.status = :gameStatus "
 				+ " and round_id is not null "
-				+ " order by round_id, time_stamp";
+				+ " order by hand_id, round_id, time_stamp";
 		Query query = getSession().createSQLQuery(hql);
 		query.setInteger("gameId", new Integer(gameId));
 		query.setString("gameStatus", gameStatus);

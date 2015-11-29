@@ -539,14 +539,16 @@ public class GameServiceImpl implements GameService {
 		System.out.println("+++++++++++++++++ Updating Card Status = " + playerId + " " + currHand + " " + currRound + " " + cardId);
 		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);
 
-		if (endPlay(gameId) != 1) {
-			//if game not complete, set it back to "started"
-        	Game currGame = gameDao.findGameById(gameId);
-        	currGame.setStatus(GameStatus.STARTED.getStatus());
-        	gameDao.save(currGame);						
-        	
-			System.out.println("+++++++++++++++++ Set Game Status to Started = " + currGame.getStatus());
-		}
+		if (endPlay(gameId) == 1) {
+			return 1;
+		} 
+		
+		//if game not complete, set it back to "started"
+    	Game currGame = gameDao.findGameById(gameId);
+    	currGame.setStatus(GameStatus.STARTED.getStatus());
+    	gameDao.save(currGame);						
+    	
+		System.out.println("+++++++++++++++++ Set Game Status to Started = " + currGame.getStatus());
 
 		return 0;
 	}
@@ -596,16 +598,17 @@ public class GameServiceImpl implements GameService {
 		//get all users in game
 		List<Integer> players;
 		players = playersInCurrRound(gameId);
+		int gameOverScore=15;  //set to something else if testing game over
 		
 		System.out.println("+++++++++++++++++ calling isGameOver");
-		//look at scores, if one user is above 100, then game over
+		//look at scores, if one user is above gameOverScore, then game over
 		for (int i = 0; i < players.size(); i++) {
     		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(players.get(i));
     		
-    		System.out.println("+++++++++++++++++ Player: " + players.get(i) + "Score: " + playerOpenGame.getScore());
-			if (playerOpenGame.getScore() >= 100) {
+    		System.out.println("+++++++++++++++++ Player: " + players.get(i) + ", Score: " + playerOpenGame.getScore());
+			if (playerOpenGame.getScore() >= gameOverScore) {
 	    	
-				System.out.println("+++++++++++++++++ Player: " + players.get(i) + " is over 100.  Game Over.");
+				System.out.println("+++++++++++++++++ Player: " + players.get(i) + " is over " + gameOverScore + ".  Game Over.");
 				return 1;
 			}
 		}

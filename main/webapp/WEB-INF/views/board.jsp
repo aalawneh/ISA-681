@@ -88,6 +88,8 @@
 										&nbsp;&nbsp;&nbsp;
 										<a href="<c:url value="/home" />">Home</a>
 										&nbsp;&nbsp;&nbsp;
+										<a href="<c:url value="/board" />">Refresh board</a>
+										&nbsp;&nbsp;&nbsp;
 										<a href="<c:url value="/logout" />">Logout</a>
 								</tr>
 							</table>
