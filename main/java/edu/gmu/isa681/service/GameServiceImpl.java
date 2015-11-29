@@ -454,7 +454,9 @@ public class GameServiceImpl implements GameService {
 				gamePlayerDao.updateGameMessage(playerId, gameId, p.getSsoId() + ": cannot play point card in first round.");
 				return -1;
 			}
-		} else if (totalPlayersInRound == 4) {
+		} 
+		
+		if (totalPlayersInRound == 4) {
 			//check card validity for first person in all other rounds
 			//cannot start with heart unless heart or queen of spades has been played
 			//however, queen of spades can be played at any time
@@ -471,13 +473,13 @@ public class GameServiceImpl implements GameService {
 					return -1;
 				}
 			}
-		} else {
+		}  else {		
 			//must play same suit if player has it in their hand
 			System.out.println("+++++++++++++++++ cardsinround = " + cardsInRound);
 			//check if same suit as first card
 			if(!cardId.substring(cardId.lastIndexOf(" ") + 1).equals(cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1))){
 				int match = 0;
-
+	
 				//if not same suit, then ensure that player does not have a matching suit in their hand
 				for (int i = 0; i < pCards.size(); i++) {
 					if(pCards.get(i).substring(pCards.get(i).lastIndexOf(" ") + 1).equals(cardsInRound.get(0).substring(cardsInRound.get(0).lastIndexOf(" ") + 1))){
@@ -503,7 +505,7 @@ public class GameServiceImpl implements GameService {
 		else if(totalPlayersInRound == 4) {
 			// everytime the current player count who played a round reaches 4 then start a new round
 			currRound += 1;
-		} else if (currRound == 13 && totalPlayersInRound == 4) {
+		} else if (currRound == 13 && totalPlayersInRound == 3) {
 			//Add TOCTOU Game Status for Checking Score.  We do this before playing the last card so that 
 			// if a user refreshes the browser and sees that no one has any cards, then they will trigger
 			// the shuffle and deal in playAGame
