@@ -5,7 +5,7 @@
  <ul class="hand">
 	<c:choose>
 	    <c:when test="${back == 1 || quorum == 0}">
-	    	<c:forEach var="item" begin="1" end="13">
+	    	<c:forEach var="item" items="${game.playerCards}">
 				<li>
 					<label class="card back" style="pointer-events: none;">
 						<span class="rank">-</span>
