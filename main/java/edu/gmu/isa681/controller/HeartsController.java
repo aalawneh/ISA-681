@@ -24,7 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,6 +62,10 @@ public class HeartsController {
 	
 	@Autowired
 	UnregisteredPlayerService unregisteredPlayerService;
+	
+    @Autowired
+    @Qualifier("authenticationManager")
+    protected AuthenticationManager authenticationManager;
 	
     @RequestMapping(value = { "/", "/welcome" }, method = RequestMethod.GET)
     public String sayHello(ModelMap model) {
@@ -125,7 +131,7 @@ public class HeartsController {
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String saveRegistration(@Valid UnregisteredPlayer uPlayer,
-            BindingResult result, ModelMap model) {
+            BindingResult result, ModelMap model, HttpServletRequest request, HttpServletResponse response) {
 
         if (result.hasErrors()) {
             System.out.println("There are errors");
@@ -160,16 +166,9 @@ public class HeartsController {
         model.addAttribute("success", "Player " + player.getSsoId() + " has been registered successfully.");
         model.addAttribute("newPlayer", "Y");
         
-/*        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(uPlayer.getSsoId(), uPlayer.getPassword());
+      //After successfully Creating user
+        authenticateUserAndSetSession(player, request);
 
-        // generate session if one doesn't exist
-        request.getSession();
-
-        token.setDetails(new WebAuthenticationDetails(request));
-        Authentication authenticatedUser = authenticationManager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);        
-*/
-                
         return "home";
     }
     
@@ -269,5 +268,20 @@ public class HeartsController {
 		    gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
         }
     	return board(model);
+    }
+    
+    private void authenticateUserAndSetSession(Player player, HttpServletRequest request) {
+        
+        String username = player.getSsoId();
+        String password = player.getPassword();
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+
+        // generate session if one doesn't exist
+        request.getSession();
+
+        token.setDetails(new WebAuthenticationDetails(request));
+        Authentication authenticatedUser = authenticationManager.authenticate(token);
+
+        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
     }
 }
