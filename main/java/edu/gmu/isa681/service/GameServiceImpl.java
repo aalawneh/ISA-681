@@ -299,6 +299,7 @@ public class GameServiceImpl implements GameService {
 				cardsInRound = cardsInCurrRound(gameToJoin.getGamePlayerKey().getGameId());
 
 				Integer currRound = currRound(gameToJoin.getGamePlayerKey().getGameId());
+				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW current round is " + currRound);
 				if(currRound == null) {
 					// then who has 2 clubs start first.
 					int currHand = gameMoveDao.getCurrHand(gameToJoin.getGamePlayerKey().getGameId());
@@ -308,7 +309,7 @@ public class GameServiceImpl implements GameService {
 				else {
 					GamePlayer whoseNext = null;
 					twoofclubs=0;
-					List<Integer> playersInRound = playersInRound(gameToJoin.getGamePlayerKey().getGameId());
+					List<Integer> playersInRound = playersInCurrRound(gameToJoin.getGamePlayerKey().getGameId());
 					if(playersInRound.size() == 4) {
 						// who lost will be first						
 						
@@ -367,7 +368,7 @@ public class GameServiceImpl implements GameService {
 		return currRound;
     }		
 
-	public List<Integer> playersInRound(int gameId) {
+	public List<Integer> playersInCurrRound(int gameId) {
 		
 		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
 		
@@ -375,6 +376,23 @@ public class GameServiceImpl implements GameService {
 		
 		for (Object[] tuple : result) {
 			totalPlayersInRound.add(((BigInteger)tuple[1]).intValue());
+		}
+		
+		for(Integer playerId : totalPlayersInRound) {
+		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       playerId = " + playerId);
+		}
+		
+		return totalPlayersInRound;
+    }
+
+	public List<Integer> playersInRoundById(int gameId, int roundId) {
+		
+		List<Object[]> result = gameMoveDao.getRoundById(gameId,roundId);
+		
+		List<Integer> totalPlayersInRound = new ArrayList<Integer>();
+		
+		for (Object[] tuple : result) {
+			totalPlayersInRound.add(((BigInteger)tuple[0]).intValue());
 		}
 		
 		for(Integer playerId : totalPlayersInRound) {
@@ -402,17 +420,20 @@ public class GameServiceImpl implements GameService {
     }
 
 	public List<String> cardsInRoundById(int gameId, int roundId) {
+	    System.out.println("---------------------- in  cardsinroundbyid ");
 		
 		List<Object[]> result = gameMoveDao.getRoundById(gameId, roundId);
 		
 		List<String> cardsInRound = new ArrayList<String>();
 		
 		for (Object[] tuple : result) {
-			cardsInRound.add((String)tuple[2]);
+		    System.out.println("---------------------- round ID : " + roundId + ", tuple : " + (BigInteger)tuple[0]);
+		    System.out.println("---------------------- round ID : " + roundId + ", tuple : " + (String)tuple[1]);
+			cardsInRound.add((String)tuple[1]);
 		}
 		
 		for(String card_id : cardsInRound) {
-		    System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ       cards_id = " + card_id);
+		    System.out.println("---------------------- round ID : " + roundId + ", cards_id = " + card_id);
 		}
 		
 		return cardsInRound;
@@ -429,7 +450,7 @@ public class GameServiceImpl implements GameService {
 		
 		Integer currHand = gameMoveDao.getCurrHand(gameId);
 		Integer currRound = currRound(gameId);
-		List<Integer> playersInRound = playersInRound(gameId);
+		List<Integer> playersInRound = playersInCurrRound(gameId);
 	    int totalPlayersInRound = playersInRound.size();
 	    List<GameMoveDto> gameMoves = getGameMoves(playerId);
 		Player p = playerDao.findPlayerById(playerId);
@@ -511,19 +532,22 @@ public class GameServiceImpl implements GameService {
         	Game currGame = gameDao.findGameById(gameId);
         	currGame.setStatus(GameStatus.CALCULATING.getStatus());
         	gameDao.save(currGame);			
-			System.out.println("+++++++++++++++++ Setting Game Status to Calculating = " + currGame.getStatus());
+			System.out.println("+++++++++++++++++ Set Game Status to Calculating = " + currGame.getStatus());
 		}
 
 		//play card
+		System.out.println("+++++++++++++++++ Updating Card Status = " + playerId + " " + currHand + " " + currRound + " " + cardId);
 		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);
-		
+
 		if (endPlay(gameId) != 1) {
 			//if game not complete, set it back to "started"
         	Game currGame = gameDao.findGameById(gameId);
         	currGame.setStatus(GameStatus.STARTED.getStatus());
         	gameDao.save(currGame);						
+        	
+			System.out.println("+++++++++++++++++ Set Game Status to Started = " + currGame.getStatus());
 		}
-		
+
 		return 0;
 	}
 	
@@ -533,25 +557,33 @@ public class GameServiceImpl implements GameService {
 	//return 0 if hand ended
 	//return 1 if hand ended and game over
 
+
+		System.out.println("+++++++++++++++++ calling endPlay");
 		Integer currRound = currRound(gameId);
-		List<Integer> playersInRound = playersInRound(gameId);
+		List<Integer> playersInRound = playersInCurrRound(gameId);
 	    int totalPlayersInRound = playersInRound.size();
-		
+	    List<Integer> winnersCircle;
+
+		System.out.println("+++++++++++++++++ currRound = " + currRound + " totalPlayersInRound = " + totalPlayersInRound);
 		//determine if hand is over
-		if (currRound == 13 && totalPlayersInRound == 4) {
+		if (currRound != null && currRound == 13 && totalPlayersInRound == 4) {
 			//update scores
 			updateScores(gameId);
 		
 		    //check if end of game
 			if (isGameOver(gameId) == 1) {
-		
+				
+				System.out.println("AAAAAAAAAAAAAAAAAAAAAAA GAME OVER AAAAAAAAAAAAAAAAAAAAAAAA");
 		        //if game over then declare winner
-				determineWinner(gameId);  //uncertain if we want to do anything else with this data
-		
+				winnersCircle = determineWinner(gameId);  //uncertain if we want to do anything else with this data
+				
+				System.out.println("AAAAAAAAAAAAAAAAAAAAAAA Winner Player Ids: " + winnersCircle);
 		        //if game over then change game status to over
 	        	Game currGame = gameDao.findGameById(gameId);
 	        	currGame.setStatus(GameStatus.OVER.getStatus());
 	        	gameDao.save(currGame);
+	        	
+				System.out.println("AAAAAAAAAAAAAAAAAAAAAAA Setting Game Status to Over = " + currGame.getStatus());
 				return 1;
 			}
 			return 0;
@@ -563,12 +595,17 @@ public class GameServiceImpl implements GameService {
 	public int isGameOver(int gameId) {
 		//get all users in game
 		List<Integer> players;
-		players = playersInRound(gameId);
+		players = playersInCurrRound(gameId);
 		
+		System.out.println("+++++++++++++++++ calling isGameOver");
 		//look at scores, if one user is above 100, then game over
 		for (int i = 0; i < players.size(); i++) {
     		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(players.get(i));
+    		
+    		System.out.println("+++++++++++++++++ Player: " + players.get(i) + "Score: " + playerOpenGame.getScore());
 			if (playerOpenGame.getScore() >= 100) {
+	    	
+				System.out.println("+++++++++++++++++ Player: " + players.get(i) + " is over 100.  Game Over.");
 				return 1;
 			}
 		}
@@ -580,15 +617,18 @@ public class GameServiceImpl implements GameService {
 	public List<Integer> determineWinner(int gameId) {
 		List<Integer> winners = new ArrayList<Integer>();
 		int min = 1000;
-		
+
+		System.out.println("+++++++++++++++++ in determineWinner");
 		//get all users in game
 		List<Integer> players;
-		players = playersInRound(gameId);
+		players = playersInCurrRound(gameId);
 		
 		//look at scores, find min value, if better than current min, clear list.  if equal to current min, add to list
 		for (int i = 0; i < players.size(); i++) {
     		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(players.get(i));
 			if (playerOpenGame.getScore() < min) {
+				
+	    		System.out.println("+++++++++++++++++ New minimum score. Player: " + players.get(i) + "Score: " + playerOpenGame.getScore());
 				min = playerOpenGame.getScore();
 				winners.clear();
 				winners.add(players.get(i));
@@ -603,9 +643,13 @@ public class GameServiceImpl implements GameService {
     		if (playerOpenGame.getScore() == min) {
 				Player p = playerDao.findPlayerById(players.get(i));
 				setCheaterMsg(players.get(i), gameId, p.getSsoId() + ": WINNER!!");
+				
+	    		System.out.println("+++++++++++++++++ WINNER! Player: " + players.get(i) + "Score: " + playerOpenGame.getScore());
 			} else {
 				Player p = playerDao.findPlayerById(players.get(i));
-				setCheaterMsg(players.get(i), gameId, p.getSsoId() + ": LOSER.");				
+				setCheaterMsg(players.get(i), gameId, p.getSsoId() + ": LOSER.");		
+
+	    		System.out.println("+++++++++++++++++ LOSER! Player: " + players.get(i) + "Score: " + playerOpenGame.getScore());
 			}
 		}
 	
@@ -619,7 +663,9 @@ public class GameServiceImpl implements GameService {
 		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(playerId);
 		int gameId = playerOpenGame.getGamePlayerKey().getGameId();
 		
-		List<Object[]> result = gameMoveDao.getGameMoves(gameId, GameStatus.STARTED.getStatus());
+		Game currgame = gameDao.findGameById(gameId);
+		
+		List<Object[]> result = gameMoveDao.getGameMoves(gameId, currgame.getStatus());
 	
 		for (Object[] tuple : result) {
 			GameMoveDto gameMoveDto = new GameMoveDto();
@@ -643,40 +689,61 @@ public class GameServiceImpl implements GameService {
 
     	Integer currRound = currRound(gameId);
 		List<String> cardsInRound; 
+		List<Integer> playersInRound;
 		int totalPlayersInRound;
 		List<Integer> players;
 		List<Integer> scoresForPlayers = new ArrayList<Integer>();
 		int loser;
 		int loserPoints;
 		
+		System.out.println("+++++++++++++++++ in updateScores");
+		
 		scoresForPlayers.add(0);
 		scoresForPlayers.add(0);
 		scoresForPlayers.add(0);
 		scoresForPlayers.add(0);
+
+		System.out.println("+++++++++++++++++ currRound: " + currRound);
     	
     	if (currRound == 13) {
     		//check to see if everyone has played
-    		players = playersInRound(gameId);
+    		players = playersInCurrRound(gameId);
     	    totalPlayersInRound = players.size();
+    	    
+    		System.out.println("+++++++++++++++++ totalPlayersInCurrRound: " + totalPlayersInRound);
+        	
     	    if (totalPlayersInRound == 4) {
     		
 	    		//for each round, calculate the points and assign them to the round loser
 	    		for (int i = 1; i <= 13; i++) {
 	    			cardsInRound = cardsInRoundById(gameId,i);
-	    			loser = PlayingCardDealer.loser(cardsInRound);
+	        		System.out.println("+++++++++++++++++ Round : " + i + ", CardsInRound : " + cardsInRound);
+
+	        		playersInRound = playersInRoundById(gameId,i);
+	        		System.out.println("+++++++++++++++++ Round : " + i + ", PlayersInRound : " + playersInRound);
+
+	        		loser = PlayingCardDealer.loser(cardsInRound);
+	        		System.out.println("+++++++++++++++++ Round : " + i + ", Loser Index : " + loser);
+	        		
 	    			for (int j = 0; j < totalPlayersInRound; j++) {
-	    				if (loser == players.get(j)) {
+	    				if (players.get(j) == playersInRound.get(loser)) {
 	    				    loserPoints = scoresForPlayers.get(j) + PlayingCardDealer.loserPoints(cardsInRound);
+	    	        		System.out.println("+++++++++++++++++ Round : " + i + ", Loser Points : " + PlayingCardDealer.loserPoints(cardsInRound));
+	    	        		System.out.println("+++++++++++++++++ Round : " + i + ", Loser Total Points : " + loserPoints);
 	    				    scoresForPlayers.set(j, loserPoints);
+	    				    j = totalPlayersInRound;
 	    				}
 	    			}
 	    		}
-	    		
+
+        		System.out.println("+++++++++++++++++ End Player Indices : " + players);
+        		System.out.println("+++++++++++++++++ End Plsyer Points : " + scoresForPlayers);
 	    		//if one player has 26, then subtract 26 from their score and add 26 to everyone else's score
-	    		for (int i = 0; i < totalPlayersInRound; i++) {
+	    		for (int i = 0; i < scoresForPlayers.size(); i++) {
 	    			if (scoresForPlayers.get(i) == 26) {
 	    				Player p = playerDao.findPlayerById(players.get(i));
 	    				setCheaterMsg(players.get(i), gameId, p.getSsoId() + ": RAN THE TABLE!!");
+	            		System.out.println("+++++++++++++++++ RAN THE TABLE : " + p.getSsoId());
 	    				for (int j = 0; j < totalPlayersInRound; j++) {
 	    					if (i == j) {
 		    				    scoresForPlayers.set(j, 0);
@@ -690,7 +757,7 @@ public class GameServiceImpl implements GameService {
 	    		}
 	    		
 	    		//update everyone's score in the DB
-	    		for (int i = 0; i < totalPlayersInRound; i++) {
+	    		for (int i = 0; i < players.size(); i++) {
 		    		//add scores to current values
 	        		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(players.get(i));
 		    		loserPoints = scoresForPlayers.get(i) + playerOpenGame.getScore();

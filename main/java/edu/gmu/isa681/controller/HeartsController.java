@@ -214,7 +214,7 @@ public class HeartsController {
         }
     	
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
-    	int ret;
+    	int ret = -1;
     	
     	GameDto game = gameService.joinAGame(playerId);
     	
@@ -259,6 +259,7 @@ public class HeartsController {
             model.addAttribute("gameBoard", gameBoard);
 	    	return board(model);
 		}
+		
         if (ret == 0) {
 		    gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
         }
