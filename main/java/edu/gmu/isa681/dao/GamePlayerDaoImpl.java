@@ -24,7 +24,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 	public List<GamePlayer> getPlayerGamesResults(int playerId) {
 		String hql = "select pg from GamePlayer pg, Game g "
 				+ "where pg.gamePlayerKey.gameId = g.gameId "
-				+ " and g.status = '" + GameStatus.Over.getStatus() + "' and pg.gamePlayerKey.gameId in "
+				+ " and g.status = '" + GameStatus.OVER.getStatus() + "' and pg.gamePlayerKey.gameId in "
 				+ "(select pg2.gamePlayerKey.gameId from GamePlayer pg2 where pg2.gamePlayerKey.playerId = :playerId)";
 		Query query = getSession().createQuery(hql);
 		query.setLong("playerId", new Long(playerId));
@@ -68,7 +68,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 		GamePlayer playerGame = null;
 		
 		String hql = "select pg from GamePlayer pg, Game g where pg.gamePlayerKey.gameId = g.gameId "
-				+ " and g.status != '" + GameStatus.Over.getStatus() + "' and pg.gamePlayerKey.playerId = :playerId)";
+				+ " and g.status != '" + GameStatus.OVER.getStatus() + "' and pg.gamePlayerKey.playerId = :playerId)";
 		Query query = getSession().createQuery(hql);
 		query.setLong("playerId", new Long(playerId));
 
