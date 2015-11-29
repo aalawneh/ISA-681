@@ -2,7 +2,7 @@ package edu.gmu.isa681.model;
 
 public enum GameStatus {
 
-	WAITING("Waiting"), STARTED("Started"), OVER("Over");
+	WAITING("Waiting"), STARTED("Started"), OVER("Over"), DECKSHUFFLING("Deckshuffling"), CALCULATING("CalculatingScore");
 
 	private String status;
 

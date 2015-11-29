@@ -215,7 +215,7 @@ public class GameServiceImpl implements GameService {
 			List<String> playerCards = gameMoveDao.getPlayerCards(gameDto.getPlayerId(), gameDto.getGameId());
 			
 			int whoseTurnId = -1;
-			List<GamePlayer> playersInGame = gamePlayerDao.getPlayersInGame(gameToJoin.getGamePlayerKey().getGameId());
+			List<GamePlayer> playersInGame = gamePlayerDao.getPlayersInGame(gameDto.getGameId());
 			
             // pre check to determine that all other players have no cards left.           
             boolean shuffle = true;
@@ -230,9 +230,15 @@ public class GameServiceImpl implements GameService {
                 }               
             }
            
-            if (playersInGame != null && playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty()) && shuffle && getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()) != "O") {
-				
-				updateScores(gameToJoin.getGamePlayerKey().getGameId());
+            if (playersInGame != null && playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty()) && shuffle 
+            		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("O")
+            		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("D")
+            		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("C")) {
+            	
+	        	Game currGame = gameDao.findGameById(gameDto.getGameId());
+	        	String prevStatus = currGame.getStatus();
+	        	currGame.setStatus(GameStatus.DECKSHUFFLING.getStatus());
+	        	gameDao.save(currGame);
 
 	        	String[] cards = PlayingCardDealer.shuffle();
 
@@ -276,10 +282,15 @@ public class GameServiceImpl implements GameService {
 	        			playerCards.addAll(tempPlayerCards);
 	        		}
 	        	}
-	        	
+
+	        	currGame.setStatus(prevStatus);
+	        	gameDao.save(currGame);
 			}
 			
-			if(playersInGame != null && playersInGame.size() == 4 && whoseTurnId < 0 && getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()) != "O") {
+			if(playersInGame != null && playersInGame.size() == 4 && whoseTurnId < 0 
+            		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("O")
+            		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("D")
+            		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("C")) {
 				// We need to figure out whose playing next - based on max(roundId)
 				// else check to see who has the 2 clubs, if no player played in current round
 
@@ -492,13 +503,24 @@ public class GameServiceImpl implements GameService {
 		else if(totalPlayersInRound == 4) {
 			// everytime the current player count who played a round reaches 4 then start a new round
 			currRound += 1;
-		} //TODO: Add TOCTOU Game Status for Checking Score
+		} else if (currRound == 13 && totalPlayersInRound == 4) {
+			//Add TOCTOU Game Status for Checking Score.  We do this before playing the last card so that 
+			// if a user refreshes the browser and sees that no one has any cards, then they will trigger
+			// the shuffle and deal in playAGame
+        	Game currGame = gameDao.findGameById(gameId);
+        	currGame.setStatus(GameStatus.CALCULATING.getStatus());
+        	gameDao.save(currGame);			
+		}
 
 		//play card
 		gameMoveDao.updateCardStatus(playerId, gameId, currHand, cardId, currRound);
 		
-		endPlay(gameId);
-		//TODO: check if game is complete and change game status.  if game not complete, set it back to "started"
+		if (endPlay(gameId) != 1) {
+			//if game not complete, set it back to "started"
+        	Game currGame = gameDao.findGameById(gameId);
+        	currGame.setStatus(GameStatus.STARTED.getStatus());
+        	gameDao.save(currGame);						
+		}
 		
 		return 0;
 	}

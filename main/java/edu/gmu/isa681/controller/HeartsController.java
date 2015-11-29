@@ -25,7 +25,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,9 +36,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import edu.gmu.isa681.model.Player;
 import edu.gmu.isa681.model.UnregisteredPlayer;
@@ -218,7 +214,6 @@ public class HeartsController {
         }
     	
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
-    	int whoseTurnId;
     	int ret;
     	
     	GameDto game = gameService.joinAGame(playerId);

@@ -99,6 +99,8 @@
                             				<c:choose> 
                             					<c:when test="${game.gameStatus eq 'W'}"><div style="color: red;">Waiting for More Players...</div></c:when>
                                 				<c:when test="${game.gameStatus eq 'S'}"><div style="color: green;">In Progress...</div></c:when>
+                                				<c:when test="${game.gameStatus eq 'D'}"><div style="color: red;">Shuffling and dealing the cards...</div></c:when>
+                                				<c:when test="${game.gameStatus eq 'C'}"><div style="color: red;">Calculating scores for hand...</div></c:when>
                             					<c:when test="${game.gameStatus eq 'O'}">Complete.</c:when>
                             				</c:choose>
 						</td>

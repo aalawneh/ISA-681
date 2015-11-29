@@ -152,6 +152,8 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 				.setProjection(Projections.property("messages"))
 				.add(Restrictions.eq("gamePlayerKey.gameId", gameId));
 				//.add(Restrictions.ne("gamePlayerKey.playerId", playerId));
+		
+		@SuppressWarnings("unchecked")
 		List<String> results = (List<String>) crit.list();
 	    System.out.println("++++++++++++++++ in getGameMessage method: all results " + results);
 		
