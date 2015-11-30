@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import edu.gmu.isa681.model.Game;
 
-@Repository("gameDoa")
+@Repository("gameDao")
 public class GameDaoImpl extends AbstractDao<Integer, Game> implements GameDao {
 
 	public void save(Game game) { 

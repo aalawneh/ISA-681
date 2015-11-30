@@ -598,7 +598,7 @@ public class GameServiceImpl implements GameService {
 		//get all users in game
 		List<Integer> players;
 		players = playersInCurrRound(gameId);
-		int gameOverScore=15;  //set to something else if testing game over
+		int gameOverScore=30;  //set to something else if testing game over
 		
 		System.out.println("+++++++++++++++++ calling isGameOver");
 		//look at scores, if one user is above gameOverScore, then game over
@@ -619,7 +619,7 @@ public class GameServiceImpl implements GameService {
 	
 	public List<Integer> determineWinner(int gameId) {
 		List<Integer> winners = new ArrayList<Integer>();
-		int min = 1000;
+		int min = 1000000;
 
 		System.out.println("+++++++++++++++++ in determineWinner");
 		//get all users in game
@@ -766,6 +766,7 @@ public class GameServiceImpl implements GameService {
 		    		loserPoints = scoresForPlayers.get(i) + playerOpenGame.getScore();
 		    		//update scores in gamePlayerDao
 	    			gamePlayerDao.updatePlayerScore(players.get(i), gameId, loserPoints);
+	    			gamePlayerDao.save(playerOpenGame);
 	    		} 
     	    }
     	}

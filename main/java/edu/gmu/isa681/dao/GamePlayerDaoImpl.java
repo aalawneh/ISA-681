@@ -11,11 +11,12 @@ import org.springframework.stereotype.Repository;
 import edu.gmu.isa681.model.GamePlayer;
 import edu.gmu.isa681.model.GameStatus;
 
-@Repository("gamePlayerDoa")
+@Repository("gamePlayerDao")
 public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implements GamePlayerDao {
 
 	public void save(GamePlayer gamePlayer) {
 		persist(gamePlayer);
+        getSession().flush(); 
 	}
 
 	/*
