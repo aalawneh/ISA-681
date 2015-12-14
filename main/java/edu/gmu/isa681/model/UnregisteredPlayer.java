@@ -98,7 +98,7 @@ public class UnregisteredPlayer {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Player))
+		if (!(obj instanceof UnregisteredPlayer))
 			return false;
 		UnregisteredPlayer other = (UnregisteredPlayer) obj;
 		if (playerId != other.playerId)

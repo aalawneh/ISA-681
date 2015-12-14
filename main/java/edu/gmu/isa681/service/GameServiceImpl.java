@@ -163,7 +163,7 @@ public class GameServiceImpl implements GameService {
 			    }
 				
 				GamePlayerKey gamePlayerKey = new GamePlayerKey();
-				gamePlayerKey.setGameId(currGameId.intValue());
+				gamePlayerKey.setGameId(currGameId);
 				gamePlayerKey.setPlayerId(playerId);
 				
 				gameToJoin.setGamePlayerKey(gamePlayerKey);
@@ -230,7 +230,7 @@ public class GameServiceImpl implements GameService {
                 }               
             }
            
-            if (playersInGame != null && playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty()) && shuffle 
+            if (playersInGame.size() == 4 && (playerCards == null || playerCards.isEmpty()) && shuffle 
             		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("O")
             		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("D")
             		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("C")) {
@@ -278,7 +278,7 @@ public class GameServiceImpl implements GameService {
 	        		start = end;
 	        		end += 13;
 	        		
-	        		if(player.getGamePlayerKey().getPlayerId() == gameToJoin.getGamePlayerKey().getPlayerId()) {
+	        		if(player.getGamePlayerKey().getPlayerId().equals(gameToJoin.getGamePlayerKey().getPlayerId())) {
 	        			playerCards.addAll(tempPlayerCards);
 	        		}
 	        	}
@@ -287,7 +287,7 @@ public class GameServiceImpl implements GameService {
 	        	gameDao.save(currGame);
 			}
 			
-			if(playersInGame != null && playersInGame.size() == 4 && whoseTurnId < 0 
+			if(playersInGame.size() == 4 && whoseTurnId < 0 
             		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("O")
             		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("D")
             		&& !getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()).equals("C")) {

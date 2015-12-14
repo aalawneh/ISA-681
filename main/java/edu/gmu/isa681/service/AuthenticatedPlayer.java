@@ -43,4 +43,38 @@ public class AuthenticatedPlayer extends org.springframework.security.core.userd
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, true, authorities);
 	}
 	// setters and getters
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + playerId;
+		result = prime * result + ((playerName == null) ? 0 : playerName.hashCode());
+		result = prime * result + ((playerSso == null) ? 0 : playerSso.hashCode());
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AuthenticatedPlayer other = (AuthenticatedPlayer) obj;
+		if (playerId != other.playerId)
+			return false;
+		if (playerName == null) {
+			if (other.playerName != null)
+				return false;
+		} else if (!playerName.equals(other.playerName))
+			return false;
+		if (playerSso == null) {
+			if (other.playerSso != null)
+				return false;
+		} else if (!playerSso.equals(other.playerSso))
+			return false;
+		return true;
+	}
 }

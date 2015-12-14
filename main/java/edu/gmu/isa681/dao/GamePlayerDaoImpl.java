@@ -28,14 +28,14 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 				+ " and g.status = '" + GameStatus.OVER.getStatus() + "' and pg.gamePlayerKey.gameId in "
 				+ "(select pg2.gamePlayerKey.gameId from GamePlayer pg2 where pg2.gamePlayerKey.playerId = :playerId)";
 		Query query = getSession().createQuery(hql);
-		query.setLong("playerId", new Long(playerId));
+		query.setLong("playerId", (long)playerId);
 
 		@SuppressWarnings("unchecked")
 		List<GamePlayer> playerGames = (List<GamePlayer>) query.list();
 		
-		for(GamePlayer pg : playerGames) {
-			pg.toString();
-		}
+//		for(GamePlayer pg : playerGames) {
+//			pg.toString();
+//		}
 		
 		return playerGames;
 	}
@@ -71,7 +71,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 		String hql = "select pg from GamePlayer pg, Game g where pg.gamePlayerKey.gameId = g.gameId "
 				+ " and g.status != '" + GameStatus.OVER.getStatus() + "' and pg.gamePlayerKey.playerId = :playerId)";
 		Query query = getSession().createQuery(hql);
-		query.setLong("playerId", new Long(playerId));
+		query.setLong("playerId", (long)playerId);
 
 		List<GamePlayer> playerGameList = (List<GamePlayer>) query.list();
 		if(playerGameList != null && !playerGameList.isEmpty()) {
@@ -88,7 +88,7 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 		String hql = "select pg.gamePlayerKey.gameId, count(pg.gamePlayerKey.playerId) "
 				+ "from GamePlayer pg group by pg.gamePlayerKey.gameId having count(pg.gamePlayerKey.playerId) < :opponents";
 		Query query = getSession().createQuery(hql);
-		query.setLong("opponents", new Long(4));
+		query.setLong("opponents", 4);
 
 		List<Object[]> gameList = (List<Object[]>) query.list();
 
@@ -133,9 +133,9 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
                 + " and gamePlayer.gamePlayerKey.gameId = :gameId ";
        
         Query query = getSession().createQuery(hql)
-                .setInteger("score", new Integer(score))
-                .setInteger("playerId", new Integer(playerId))
-                .setInteger("gameId", new Integer(gameId));
+                .setInteger("score", (int)score)
+                .setInteger("playerId", (int)playerId)
+                .setInteger("gameId", (int)gameId);
 
         int result = query.executeUpdate();
        
@@ -186,8 +186,8 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
        
         Query query = getSession().createQuery(hql)
                 .setString("message", message)
-                .setInteger("playerId", new Integer(playerId))
-                .setInteger("gameId", new Integer(gameId));
+                .setInteger("playerId", (int)playerId)
+                .setInteger("gameId", (int)gameId);
 
         int result = query.executeUpdate();
        

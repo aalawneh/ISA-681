@@ -118,7 +118,7 @@ public class PlayingCardDealer {
 		else if(cardValue1.equalsIgnoreCase("a"))
 			cardRank1 = 14;
 		else
-			cardRank1 = new Integer(cardValue1).intValue();
+			cardRank1 = Integer.parseInt(cardValue1);
 		
 		int cardRank2 = -1;
 		if(cardValue2.equalsIgnoreCase("j")) 
@@ -130,7 +130,7 @@ public class PlayingCardDealer {
 		else if(cardValue2.equalsIgnoreCase("a")) 
 			cardRank2 = 14;
 		else 
-			cardRank2 = new Integer(cardValue2).intValue();
+			cardRank2 = Integer.parseInt(cardValue2);
 		
 		int result = 0;
 		if(cardRank1 > cardRank2)

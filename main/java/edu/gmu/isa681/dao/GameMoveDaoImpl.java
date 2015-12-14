@@ -57,7 +57,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 	public Integer getCurrHand(int gameId) {
 		String hql = "select max(gameMoveKey.handId) from GameMove where gameMoveKey.gameId = :gameId";
 		Query query = getSession().createQuery(hql);
-		query.setInteger("gameId", new Integer(gameId));
+		query.setInteger("gameId", (int)gameId);
 		
 		Integer handId = (Integer) query.list().get(0);
 		System.out.println("+++++++++++++++++ current handId=" + handId + " for gameId=" + gameId);
@@ -134,7 +134,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
     	System.out.println("+++++++++++++++++++++++++ query = " + hql);
 		
 		Query query = getSession().createSQLQuery(hql);
-		query.setInteger("gameId", new Integer(gameId));
+		query.setInteger("gameId", (int)gameId);
 
 		@SuppressWarnings("unchecked")
 		List<Object[]> result = (List<Object[]>) query.list();
@@ -154,8 +154,8 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
                 + " and round_id = :roundId "
                 + " order by time_stamp";
         Query query = getSession().createSQLQuery(hql);
-        query.setInteger("gameId", new Integer(gameId))
-             .setInteger("roundId", new Integer(roundId));
+        query.setInteger("gameId", (int)gameId)
+             .setInteger("roundId", (int)roundId);
 
         @SuppressWarnings("unchecked")
         List<Object[]> result = (List<Object[]>) query.list();
@@ -183,11 +183,11 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 	    
 		java.util.Date date= new java.util.Date();
 		Query query = getSession().createQuery(hql)
-				.setInteger("roundId", new Integer(roundId))
+				.setInteger("roundId", (int)roundId)
 				.setTimestamp("newTimeStamp", new Timestamp(date.getTime()))
-				.setInteger("playerId", new Integer(playerId))
-				.setInteger("gameId", new Integer(gameId))
-				.setInteger("handId", new Integer(handId))
+				.setInteger("playerId", (int)playerId)
+				.setInteger("gameId", (int)gameId)
+				.setInteger("handId", (int)handId)
 				.setString("cardId", cardId.trim().toLowerCase());
 
 		int result = query.executeUpdate();
@@ -207,7 +207,7 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 				+ " and round_id is not null "
 				+ " order by hand_id, round_id, time_stamp";
 		Query query = getSession().createSQLQuery(hql);
-		query.setInteger("gameId", new Integer(gameId));
+		query.setInteger("gameId", (int)gameId);
 		query.setString("gameStatus", gameStatus);
 
 		@SuppressWarnings("unchecked")
