@@ -168,6 +168,17 @@ public class HeartsController {
         return "home";
     }
     
+    @RequestMapping(value="/joingame", method = RequestMethod.POST)
+    public String joinGame (HttpServletRequest request, HttpServletResponse response) {
+    	int playerId = LoggedInPlayer.getLoggedInPlayerId();
+    	
+    	// 1. a) Check if the player already in a game and the game is not over, then return the game Id.
+    	//    b) Else check if there is an open game then have him join the game and return the game Id.
+    	
+    	gameService.joinAGame(playerId);    	
+    	
+        return "redirect:/board";
+    }
     
     @RequestMapping(value="/board", method = RequestMethod.GET)
     public String board(ModelMap model) {
@@ -177,7 +188,13 @@ public class HeartsController {
     	// 1. a) Check if the player already in a game and the game is not over, then return the game Id.
     	//    b) Else check if there is an open game then have him join the game and return the game Id.
     	
-    	GameDto game = gameService.joinAGame(playerId);
+    	GameDto game = gameService.getGame(playerId);
+    	if (game == null) {
+            model.addAttribute("failure", "Player has not joined game.");
+            model.addAttribute("playerError", "Y");
+    		return goHome(model);
+    	}
+    	
     	System.out.println("++++++++++++++++++++++++" + game.getPlayerId());
         model.addAttribute("loggedInPlayerSso", LoggedInPlayer.getLoggedInPlayerSso());
         model.addAttribute("loggedInPlayerId", LoggedInPlayer.getLoggedInPlayerId());
@@ -261,6 +278,7 @@ public class HeartsController {
 		}
 		
         if (ret == 0) {
+        	gameService.joinAGame(playerId);
 		    gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
         }
     	return board(model);

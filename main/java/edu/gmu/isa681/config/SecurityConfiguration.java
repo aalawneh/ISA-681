@@ -80,7 +80,7 @@ exceptions and display our player defined page instead of showing default HTTP 4
 	  http.authorizeRequests()
 	  	//.antMatchers("/", "/welcome", "/register", "/login").permitAll()
 	  	.antMatchers("/", "/welcome", "/register").permitAll()
-	  	.antMatchers("/play**", "/board**","/home**").access("hasRole('ROLE_PLAYER')")
+	  	.antMatchers("/play**", "/board**","/home**","/joingame**").access("hasRole('ROLE_PLAYER')")
 	  	.and().formLogin().loginPage("/login")
 	  	//.defaultSuccessUrl("/welcome")
 	  	.successHandler(customSuccessHandler)	  	

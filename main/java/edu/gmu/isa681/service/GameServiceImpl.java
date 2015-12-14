@@ -116,6 +116,116 @@ public class GameServiceImpl implements GameService {
 		}
 		return gameStatus;
 	}	
+
+	public GameDto getGame(int playerId) {
+		GameDto gameDto = null;
+
+		// 1. Check if the player already in a game and the game is not over, then return the GameDto.
+		GamePlayer playerOpenGame = gamePlayerDao.getPlayerOpenGame(playerId);
+		
+		List<String> cardsInRound = null;
+		
+		int twoofclubs = 0;
+
+		if(playerOpenGame == null) {
+			return null;
+		}		
+		
+		gameDto = new GameDto();
+		gameDto.setGameId(playerOpenGame.getGamePlayerKey().getGameId());
+		gameDto.setPlayerId(playerOpenGame.getGamePlayerKey().getPlayerId());
+		gameDto.setPlayerPosition(playerOpenGame.getPosition());
+		gameDto.setPlayerScore(playerOpenGame.getScore());
+		List<OpponentsDto> opponents = new ArrayList<OpponentsDto>();
+		gameDto.setOpponents(opponents);
+			
+		// get the list of opponents
+		List<GamePlayer> oppnentsIngame = gamePlayerDao.getOpponentsInGame(playerOpenGame.getGamePlayerKey().getGameId(), playerOpenGame.getGamePlayerKey().getPlayerId());
+		for(GamePlayer g : oppnentsIngame) {
+			Player p = playerDao.findPlayerById(g.getGamePlayerKey().getPlayerId());
+			System.out.println("++++++++++++++++++++++++++++++++++++++++++" + p.getLastName());
+			OpponentsDto dto = new OpponentsDto();
+			dto.setPlayerId(p.getPlayerId());
+			dto.setPlayerSso(p.getSsoId());
+			dto.setFirstName(p.getFirstName());
+			dto.setLastName(p.getLastName());
+			dto.setPosition(g.getPosition());		
+			dto.setScore(g.getScore());
+				
+			opponents.add(dto);				
+		}
+			
+		// get player cards
+		List<String> playerCards = gameMoveDao.getPlayerCards(gameDto.getPlayerId(), gameDto.getGameId());
+		
+		int whoseTurnId = -1;
+		List<GamePlayer> playersInGame = gamePlayerDao.getPlayersInGame(gameDto.getGameId());
+			
+		if(playersInGame.size() == 4 && whoseTurnId < 0 
+           		&& !getGameStatusForPlayer(playerOpenGame.getGamePlayerKey().getPlayerId()).equals("O")
+           		&& !getGameStatusForPlayer(playerOpenGame.getGamePlayerKey().getPlayerId()).equals("D")
+           		&& !getGameStatusForPlayer(playerOpenGame.getGamePlayerKey().getPlayerId()).equals("C")) {
+			// We need to figure out whose playing next - based on max(roundId)
+			// else check to see who has the 2 clubs, if no player played in current round
+
+			playerCards = PlayingCardDealer.sort(playerCards);
+			
+			cardsInRound = cardsInCurrRound(playerOpenGame.getGamePlayerKey().getGameId());
+
+			Integer currRound = currRound(playerOpenGame.getGamePlayerKey().getGameId());
+			System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW current round is " + currRound);
+			if(currRound == null) {
+				// then who has 2 clubs start first.
+				int currHand = gameMoveDao.getCurrHand(playerOpenGame.getGamePlayerKey().getGameId());
+				whoseTurnId = gameMoveDao.whoHasTwoClubs(playerOpenGame.getGamePlayerKey().getGameId(), currHand);
+				twoofclubs=1;
+			}
+			else {
+				GamePlayer whoseNext = null;
+				twoofclubs=0;
+				List<Integer> playersInRound = playersInCurrRound(playerOpenGame.getGamePlayerKey().getGameId());
+				if(playersInRound.size() == 4) {
+					// who lost will be first						
+					
+					// therefore player at location i lost, then he get to start
+					int index = PlayingCardDealer.loser(cardsInRound);
+					whoseTurnId = playersInRound.get(index);
+					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW loser is " + whoseTurnId);
+				}
+				else {
+					int lastPrayerId = playersInRound.get(playersInRound.size()-1);
+					GamePlayer aPlayer = gamePlayerDao.getPlayerInGame(playerOpenGame.getGamePlayerKey().getGameId(), lastPrayerId);
+					
+					if(aPlayer.getPosition() == 3) {
+						whoseNext = gamePlayerDao.getPlayerPositionInGame(playerOpenGame.getGamePlayerKey().getGameId(), 0);
+					}
+					else {
+						whoseNext = gamePlayerDao.getPlayerPositionInGame(playerOpenGame.getGamePlayerKey().getGameId(), aPlayer.getPosition()+1);
+					}
+					whoseTurnId = whoseNext.getGamePlayerKey().getPlayerId();
+				}
+			}						
+		}
+
+		if (whoseTurnId >= 0 ){		
+			gameDto.setPlayerCards(playerCards);
+			gameDto.setWhoseTurnId(whoseTurnId);
+			Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
+			System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
+			gameDto.setWhoseTurnName(whoseTurn.getSsoId());
+			//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
+			gameDto.setCardsInRound(cardsInRound);
+			if (twoofclubs == 1) {
+				gameDto.setGameMsg(whoseTurn.getSsoId() + ": must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+			} else {
+				gameDto.setGameMsg(gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+			}
+		}
+			
+		gameDto.setGameStatus(getGameStatusForPlayer(playerOpenGame.getGamePlayerKey().getPlayerId()));
+		
+		return gameDto;		
+	}
 	
 	public GameDto joinAGame(int playerId) {
 		GameDto gameDto = null;

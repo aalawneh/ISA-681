@@ -9,6 +9,8 @@ import edu.gmu.isa681.dto.PlayerGamesDto;
 public interface GameService {
 
 	public PlayerGamesDto getPlayerGamesResults(int playerId);
+
+	public GameDto getGame(int playerId);
 	
 	public GameDto joinAGame(int playerId);
 		

@@ -27,6 +27,11 @@ table#t01 {
 </head>
 <body>
 	<div class="success">
+		<c:if test="${playerError eq 'Y' || playerError eq 'y'}">
+		    <div class="alert alert-danger">
+				<p>Error message : ${failure}</p>
+			</div>
+		</c:if>
 		<table style="width: 100%; border: 0">
 			<tr>
 		        <c:url var="logoutUrl" value="/logout"/>
@@ -34,9 +39,14 @@ table#t01 {
                     <td align="left" colspan="2"><input type="submit" value="Log out" class="btn btn-primary btn-sm"/></td>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 </form>
-				<td align="right">
+		        <c:url var="gameUrl" value="/joingame"/>
+                <form action="${gameUrl}" method="post">
+                    <td align="right" colspan="2"><input type="submit" value="Join a game" class="btn btn-primary btn-sm"/></td>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                </form>
+				<!-- <td align="right">
 					<a href="<c:url value="/board" />">Join a game</a>
-				</td>
+				</td> -->
 			</tr>
 		</table>
 		<br /> <br />
