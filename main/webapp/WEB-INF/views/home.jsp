@@ -84,7 +84,11 @@ table#t01 {
 					<tr>
 						<td class="bord"><a href="<c:url value='/board?oldGameId=${item.gameId}' />"><c:out value="${item.gameId}"/></a></td>
 						<td class="bord"><c:out value="${item.playersScores}"/></td>
-						<td class="bord"><c:out value="${item.playerWon}"/></td>
+						
+		            	<c:choose> 
+                        	<c:when test="${item.playerWon eq 'Y'}"><td class="bord"><c:out value="${item.playerWon}"/></td></c:when>
+                            <c:otherwise><td class="bord"><c:out value="N"/></td></c:otherwise>
+                        </c:choose>
 					</tr>
 				</c:forEach>
 			</table>		
