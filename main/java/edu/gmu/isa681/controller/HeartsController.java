@@ -36,6 +36,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.gmu.isa681.model.Player;
 import edu.gmu.isa681.model.UnregisteredPlayer;
@@ -180,20 +181,32 @@ public class HeartsController {
         return "redirect:/board";
     }
     
+    //, @RequestParam(value="oldGameId") Integer oldGameId
     @RequestMapping(value="/board", method = RequestMethod.GET)
-    public String board(ModelMap model) {
-    	
+    public String board(@RequestParam(value = "oldGameId", defaultValue = "-1", required = false) final Integer oldGameId, ModelMap model) {
+    	int oldGame = 0;
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
+    	GameDto game = null;
     	
     	// 1. a) Check if the player already in a game and the game is not over, then return the game Id.
     	//    b) Else check if there is an open game then have him join the game and return the game Id.
     	
-    	GameDto game = gameService.getGame(playerId);
-    	if (game == null) {
-            model.addAttribute("failure", "Player has not joined game.");
-            model.addAttribute("playerError", "Y");
-    		return goHome(model);
+    	if (oldGameId == -1) {
+    		game = gameService.getGame(playerId);
+    	} else if (oldGameId > 0) {
+    		game = gameService.getGameHistory(oldGameId,playerId);
+    		oldGame = 1;
+    	} else {
+			model.addAttribute("failure", "Invalid game requested.");
+			model.addAttribute("playerError", "Y");
+			return goHome(model);
     	}
+    	
+		if (game == null) {
+			model.addAttribute("failure", "Requested game not found.");
+			model.addAttribute("playerError", "Y");
+			return goHome(model);
+		}
     	
     	System.out.println("++++++++++++++++++++++++" + game.getPlayerId());
         model.addAttribute("loggedInPlayerSso", LoggedInPlayer.getLoggedInPlayerSso());
@@ -215,7 +228,13 @@ public class HeartsController {
         model.addAttribute("quorum", quorum);
         model.addAttribute("whoseTurnId", game.getWhoseTurnId());
 
-        List<GameMoveDto> gameMoves = gameService.getGameMoves(playerId);
+        List<GameMoveDto> gameMoves = null;
+        
+        if (oldGame == 1) {
+            gameMoves = gameService.getGameOldMoves(game.getGameId());
+        } else {
+            gameMoves = gameService.getGameMoves(playerId);
+        }
     	model.addAttribute("gameMoves", gameMoves);
     	
         return "board";
@@ -241,7 +260,7 @@ public class HeartsController {
             model.addAttribute("gameBoard", gameBoard);
 			System.out.println("+++++++++++++++++++++++++ board POST play = NOT YOUR TURN " + playerId);
 			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), LoggedInPlayer.getLoggedInPlayerSso() + " tried to play when it is not their turn.");
-    		return board(model);
+    		return board(-1,model);
     	}
     	
     	// First mark the card that it has been used
@@ -274,14 +293,14 @@ public class HeartsController {
 			System.out.println("+++++++++++++++++++++++++ board POST play = INVALID CARD " + gameBoard.getCardId());
     		gameBoard.setCardId("");
             model.addAttribute("gameBoard", gameBoard);
-	    	return board(model);
+	    	return board(-1, model);
 		}
 		
         if (ret == 0) {
         	gameService.joinAGame(playerId);
 		    gameService.setCheaterMsg(playerId, gameBoard.getGameId(), null);
         }
-    	return board(model);
+    	return board(-1, model);
     }
     
     private void authenticateUserAndSetSession(Player player, HttpServletRequest request) {

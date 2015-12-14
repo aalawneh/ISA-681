@@ -76,7 +76,7 @@ public class GameServiceImpl implements GameService {
 				strBuff = new StringBuffer();
 			} 
 			
-			String opponentName = (playerDao.findPlayerById(game.getGamePlayerKey().getPlayerId())).getLastName();
+			String opponentName = (playerDao.findPlayerById(game.getGamePlayerKey().getPlayerId())).getSsoId();
 			strBuff.append(opponentName).append(" [").append(game.getScore()).append("] ");
 			if(game.getScore() < winnerScore) {
 				winnerScore = game.getScore();
@@ -225,6 +225,45 @@ public class GameServiceImpl implements GameService {
 		gameDto.setGameStatus(getGameStatusForPlayer(playerOpenGame.getGamePlayerKey().getPlayerId()));
 		
 		return gameDto;		
+	}
+	
+	public GameDto getGameHistory(int gameId, int playerId) {
+	    GameDto gameDto = null;
+
+		// 1. Check if the player already in a game and the game is not over, then return the GameDto.
+		GamePlayer playerOldGame = gamePlayerDao.getPlayerOldGame(gameId,playerId);
+
+		if(playerOldGame == null) {
+			return null;
+		}
+		
+		gameDto = new GameDto();
+		gameDto.setGameId(playerOldGame.getGamePlayerKey().getGameId());
+		gameDto.setPlayerId(playerOldGame.getGamePlayerKey().getPlayerId());
+		gameDto.setPlayerPosition(playerOldGame.getPosition());
+		gameDto.setPlayerScore(playerOldGame.getScore());
+		List<OpponentsDto> opponents = new ArrayList<OpponentsDto>();
+		gameDto.setOpponents(opponents);
+			
+		// get the list of opponents
+		List<GamePlayer> oppnentsIngame = gamePlayerDao.getOpponentsInGame(playerOldGame.getGamePlayerKey().getGameId(), playerOldGame.getGamePlayerKey().getPlayerId());
+		for(GamePlayer g : oppnentsIngame) {
+			Player p = playerDao.findPlayerById(g.getGamePlayerKey().getPlayerId());
+			System.out.println("++++++++++++++++++++++++++++++++++++++++++" + p.getLastName());
+			OpponentsDto dto = new OpponentsDto();
+			dto.setPlayerId(p.getPlayerId());
+			dto.setPlayerSso(p.getSsoId());
+			dto.setFirstName(p.getFirstName());
+			dto.setLastName(p.getLastName());
+			dto.setPosition(g.getPosition());		
+			dto.setScore(g.getScore());
+				
+			opponents.add(dto);				
+		}
+		
+	    gameDto.setGameStatus(GameStatus.OVER.getStatus());
+
+	    return gameDto;
 	}
 	
 	public GameDto joinAGame(int playerId) {
@@ -791,7 +830,25 @@ public class GameServiceImpl implements GameService {
 		}
 		
 		return gameMoves;
+	}
+	
+	public List<GameMoveDto> getGameOldMoves(int gameId) {
 		
+		List<GameMoveDto> gameMoves = new ArrayList<GameMoveDto>();		
+		
+		List<Object[]> result = gameMoveDao.getGameMoves(gameId, GameStatus.OVER.getStatus());
+	
+		for (Object[] tuple : result) {
+			GameMoveDto gameMoveDto = new GameMoveDto();
+			gameMoveDto.setPlayerName((String)tuple[0]);
+			gameMoveDto.setHandId(((BigInteger)tuple[1]).intValue());   
+			gameMoveDto.setCardId((String)tuple[2]);
+			gameMoveDto.setRoundId(((BigInteger)tuple[3]).intValue());
+			
+			gameMoves.add(gameMoveDto);
+		}
+		
+		return gameMoves;
 	}
 	
 	public List<String> getPlayerCards(int playerId, int gameId) {

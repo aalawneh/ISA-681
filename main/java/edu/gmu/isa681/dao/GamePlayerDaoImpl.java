@@ -60,6 +60,27 @@ public class GamePlayerDaoImpl extends AbstractDao<Integer, GamePlayer> implemen
 
 		return results;
 	}
+
+	// Check if the player played in this game, and the game is over.
+	// select * from GAME_PLAYER pg, GAME g where g.game_id = 2 and player_id = 5 and status = 'O'; -- OVER
+	@SuppressWarnings("unchecked")
+	public GamePlayer getPlayerOldGame(int gameId, int playerId) {
+
+		GamePlayer playerGame = null;
+		
+		String hql = "select pg from GamePlayer pg, Game g where pg.gamePlayerKey.gameId = :gameId "
+				+ " and g.status = '" + GameStatus.OVER.getStatus() + "' and pg.gamePlayerKey.playerId = :playerId)";
+		Query query = getSession().createQuery(hql);
+		query.setInteger("playerId", (int)playerId)
+             .setInteger("gameId", (int)gameId);
+
+		List<GamePlayer> playerGameList = (List<GamePlayer>) query.list();
+		if(playerGameList != null && !playerGameList.isEmpty()) {
+			playerGame = (GamePlayer) query.list().get(0);
+		}
+
+		return playerGame;
+	}
 	
 	// Check if the player already in a game and the game is not over.
 	// select * from game_player pg, game g where g.game_id = pg.game_id and player_id = 2 and status != 'O'; -- OVER

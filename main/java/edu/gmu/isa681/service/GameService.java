@@ -13,6 +13,8 @@ public interface GameService {
 	public GameDto getGame(int playerId);
 	
 	public GameDto joinAGame(int playerId);
+	
+	public GameDto getGameHistory(int gameId, int playerId);
 		
 	public String getGameStatusForPlayer(int playerId);
 	
@@ -21,6 +23,8 @@ public interface GameService {
 	public void setCheaterMsg(int playerId, int gameId, String gameMsg);
 	
 	public List<GameMoveDto> getGameMoves(int playerId);
+	
+	public List<GameMoveDto> getGameOldMoves(int gameId);
 	
 	public List<String> getPlayerCards(int playerId, int gameId);
 	

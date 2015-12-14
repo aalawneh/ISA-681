@@ -82,7 +82,7 @@ table#t01 {
 				</tr>
 				<c:forEach var="item" items="${playersScores}">
 					<tr>
-						<td class="bord"><a href="<c:url value='/register' />"><c:out value="${item.gameId}"/></a></td>
+						<td class="bord"><a href="<c:url value='/board?oldGameId=${item.gameId}' />"><c:out value="${item.gameId}"/></a></td>
 						<td class="bord"><c:out value="${item.playersScores}"/></td>
 						<td class="bord"><c:out value="${item.playerWon}"/></td>
 					</tr>

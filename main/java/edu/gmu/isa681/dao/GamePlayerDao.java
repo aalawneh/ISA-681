@@ -14,6 +14,8 @@ public interface GamePlayerDao {
 
 	public GamePlayer getPlayerPositionInGame(int gameId, int position);
 
+	public GamePlayer getPlayerOldGame(int gameId, int playerId);
+	
 	public GamePlayer getPlayerOpenGame(int playerId);
 
 	public List<Object[]> getOpenGame(int playerId);
