@@ -92,7 +92,11 @@
 										&nbsp;&nbsp;&nbsp;
 										<a href="<c:url value="/board" />">Refresh board</a>
 										&nbsp;&nbsp;&nbsp;
-										<a href="<c:url value="/logout" />">Logout</a>
+		                                <c:url var="logoutUrl" value="/logout"/>
+                                        <form action="${logoutUrl}" method="post">
+                                            <input type="submit" value="Log out" class="btn btn-primary btn-sm"/>
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                        </form>
 								</tr>
 							</table>
 						</td>									

@@ -29,7 +29,11 @@ table#t01 {
 	<div class="success">
 		<table style="width: 100%; border: 0">
 			<tr>
-				<td align="left" colspan="2"><a href="<c:url value="/logout" />">Logout</a></td>
+		        <c:url var="logoutUrl" value="/logout"/>
+                <form action="${logoutUrl}" method="post">
+                    <td align="left" colspan="2"><input type="submit" value="Log out" class="btn btn-primary btn-sm"/></td>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                </form>
 				<td align="right">
 					<a href="<c:url value="/board" />">Join a game</a>
 				</td>
