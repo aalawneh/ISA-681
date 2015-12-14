@@ -18,6 +18,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<!-- uncomment the below line to refresh the data constantly -->
 	<meta http-equiv="refresh" content="10">
 	<title>Hearts Playing Cards</title>
 	
