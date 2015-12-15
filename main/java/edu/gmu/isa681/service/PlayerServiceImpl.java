@@ -24,9 +24,9 @@ public class PlayerServiceImpl implements PlayerService{
 		dao.save(player);
 	}
 	
-	public Player findPlayerById(int id) {
-		return dao.findPlayerById(id);
-	}
+//	public Player findPlayerById(int id) {
+//		return dao.findPlayerById(id);
+//	}
 
 	public Player findBySso(String sso) {
 		return dao.findBySSO(sso);

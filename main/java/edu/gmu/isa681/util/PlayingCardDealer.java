@@ -95,7 +95,7 @@ public class PlayingCardDealer {
 		return cards;
 	}
 	
-	public static int compare(String s1, String s2) {
+	private static int compare(String s1, String s2) {
 		StringTokenizer st1 = new StringTokenizer(s1," ");  
 		StringTokenizer st2 = new StringTokenizer(s2," ");
 		

@@ -31,13 +31,13 @@ public class GameMoveKey implements Serializable {
 		super();
 	}
 	
-	public GameMoveKey(Integer playerId, Integer gameId, Integer handId, String cardId) {
-		super();
-		this.playerId = playerId;
-		this.gameId = gameId;
-		this.handId = handId;
-		this.cardId = cardId;
-	}
+//	public GameMoveKey(Integer playerId, Integer gameId, Integer handId, String cardId) {
+//		super();
+//		this.playerId = playerId;
+//		this.gameId = gameId;
+//		this.handId = handId;
+//		this.cardId = cardId;
+//	}
 
 	public Integer getPlayerId() {
 		return playerId;

@@ -72,9 +72,9 @@ public class GamePlayer implements Serializable {
 		this.messages = messages;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
+//	public static long getSerialversionuid() {
+//		return serialVersionUID;
+//	}
 
 	@Override
 	public int hashCode() {

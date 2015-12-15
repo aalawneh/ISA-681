@@ -86,7 +86,7 @@ exceptions and display our player defined page instead of showing default HTTP 4
 	  	.successHandler(customSuccessHandler)	  	
 	  	.usernameParameter("ssoId").passwordParameter("password")
 	  	.and().csrf()
-	  	.and().exceptionHandling().accessDeniedPage("/Access_Denied");
+	  	.and().exceptionHandling().accessDeniedPage("/accessdenied");
 	}
 	
     @Bean(name="authenticationManager")

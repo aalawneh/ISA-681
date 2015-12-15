@@ -6,7 +6,7 @@ public interface PlayerService {
 
 	public void save(Player player);
 
-	public Player findPlayerById(int id);
+//	public Player findPlayerById(int id);
 
 	public Player findBySso(String sso);
 }
