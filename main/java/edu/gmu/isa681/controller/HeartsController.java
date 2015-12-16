@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.gmu.isa681.model.Player;
-import edu.gmu.isa681.model.TrashCards;
 import edu.gmu.isa681.model.UnregisteredPlayer;
 import edu.gmu.isa681.model.GameBoard;
 import edu.gmu.isa681.dto.GameDto;
@@ -186,18 +185,60 @@ public class HeartsController {
     @RequestMapping(value="/trashCards", method = RequestMethod.POST)
     public String trashCards (@Valid GameBoard gameBoard, 
 	           BindingResult result, ModelMap model) {
+    	
+        if (result.hasErrors()) {
+            System.out.println("There are errors");
+            return "board";
+        }
+    	
     	int playerId = LoggedInPlayer.getLoggedInPlayerId();
     	int gameId = gameBoard.getGameId();
     	String[] trashCards = gameBoard.getTrashCards();
-    	
-    	if(trashCards.length < 4) {
-    		// display error and do not continue.
-    	}
-    	
+
     	System.out.println("_______________________________ GameID=" + gameId);
     	System.out.println("_______________________________ cardId=" + trashCards[0]);
     	
-    	gameService.trashCards(gameId, playerId, trashCards);    	
+    	if(trashCards.length != 3) {
+    		// display error and do not continue.
+			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " tried not to pass only 3 cards.";
+			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
+	    	return board(-1, model);
+    	}    	
+    	
+    	List<String> playerCards = gameService.getPlayerCards(playerId, gameId);
+    	int found = 0;
+    	
+    	//loop through the list to determine if the player has the cards
+    	boolean isFirstCardValid = false;
+    	boolean isSecondCardValid = false;
+    	boolean isThirdCardValid = false;
+		for (int i = 0; i < playerCards.size(); i++) {
+			if (playerCards.get(i).equals(trashCards[0]) || playerCards.get(i).equals(trashCards[1]) || playerCards.get(i).equals(trashCards[2])) {				
+				found+=1;
+				if(playerCards.get(i).equals(trashCards[0])) isFirstCardValid = true;
+				if(playerCards.get(i).equals(trashCards[1])) isSecondCardValid = true;
+				if(playerCards.get(i).equals(trashCards[2])) isThirdCardValid = true;
+				
+		    	System.out.println("_______________________________ found=" + found);
+				
+				
+				continue;
+			}
+		}
+		if (found!=3) {
+	    	//player tried to pass a card that he does not have.	    	
+			//notify users and prevent card from being played.
+			String cardsNotWithPlayers = "[";
+			if(!isFirstCardValid) cardsNotWithPlayers = cardsNotWithPlayers.concat(trashCards[0]).concat(" ");
+			if(!isSecondCardValid) cardsNotWithPlayers = cardsNotWithPlayers.concat(trashCards[1]).concat(" ");
+			if(!isThirdCardValid) cardsNotWithPlayers = cardsNotWithPlayers.concat(trashCards[2]).concat(" ");
+			cardsNotWithPlayers = cardsNotWithPlayers + "]";
+			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " did not pass a valid card from their hand. Player does not have these cards: " + cardsNotWithPlayers;
+			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
+	    	return board(-1, model);
+		} else {
+			gameService.trashCards(gameId, playerId, trashCards);
+		}		
     	
         return "redirect:/board";
     }    

@@ -1,5 +1,7 @@
 package edu.gmu.isa681.config;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -15,6 +17,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import edu.gmu.isa681.util.ProtectedConfigFile;
 
 @Configuration
 @EnableTransactionManagement
@@ -40,9 +44,18 @@ public class HibernateConfiguration {
         dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driverClassName"));
         dataSource.setUrl(environment.getRequiredProperty("jdbc.url"));
         dataSource.setUsername(environment.getRequiredProperty("jdbc.username"));
-        //dataSource.setPassword(environment.getRequiredProperty("jdbc.password"));
-        String encodedPassword = environment.getRequiredProperty("jdbc.password"); 
-        dataSource.setPassword(encodedPassword);
+        String encodedPassword = environment.getRequiredProperty("jdbc.password");
+        String decryptedPassword = null;
+		try {
+			decryptedPassword = ProtectedConfigFile.decrypt(encodedPassword);
+		} catch (GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        dataSource.setPassword(decryptedPassword);
         return dataSource;
     }
     

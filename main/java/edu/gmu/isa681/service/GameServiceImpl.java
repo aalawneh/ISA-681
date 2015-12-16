@@ -216,7 +216,7 @@ public class GameServiceImpl implements GameService {
 		if (whoseTurnId >= 0 ){		
 			gameDto.setPlayerCards(playerCards);
 			gameDto.setCardsInRound(cardsInRound);
-			if(didAllPlayersTrashCards(playerOpenGame.getGamePlayerKey().getGameId())) {
+			if(didAllPlayersTrashCards(gameDto.getGameId())) {
 				gameDto.setWhoseTurnId(whoseTurnId);
 				Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
 				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
@@ -493,7 +493,7 @@ public class GameServiceImpl implements GameService {
 			if (whoseTurnId >= 0 ){		
 				gameDto.setPlayerCards(playerCards);
 				gameDto.setCardsInRound(cardsInRound);
-				if(didAllPlayersTrashCards(playerOpenGame.getGamePlayerKey().getGameId())) {
+				if(didAllPlayersTrashCards(gameDto.getGameId())) {
 					gameDto.setWhoseTurnId(whoseTurnId);
 					Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
 					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
