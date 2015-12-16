@@ -1,5 +1,6 @@
 package edu.gmu.isa681.model;
 
+import java.util.Arrays;
 
 public class GameBoard {
 	private int gameId;
@@ -20,9 +21,9 @@ public class GameBoard {
 	}
 	
 	public String[] getTrashCards() {
-		return trashCards;
+		return Arrays.copyOf(trashCards, trashCards.length);
 	}
 	public void setTrashCards(String[] trashCards) {
-		this.trashCards = trashCards;
+		this.trashCards = trashCards.clone();
 	}
 }

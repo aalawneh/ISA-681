@@ -962,7 +962,7 @@ public class GameServiceImpl implements GameService {
 			for(TrashCards tc : trashCards) {
 				int playerId = tc.getTrashCardsKey().getSrcPlayerId();
 				String passedCards = tc.getCards();
-				String recievedCards = null;
+				String recievedCards = "";
 				
 				for(TrashCards tc2 : trashCards) {
 					if(tc2.getTrashCardsKey().getDestPlayerId() == playerId) {

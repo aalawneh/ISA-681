@@ -200,7 +200,7 @@ public class HeartsController {
     	
     	if(trashCards.length != 3) {
     		// display error and do not continue.
-			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " tried not to pass only 3 cards.";
+			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " tried to pass more than 3 cards.";
 			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
 	    	return board(-1, model);
     	}    	
@@ -233,7 +233,11 @@ public class HeartsController {
 			if(!isSecondCardValid) cardsNotWithPlayers = cardsNotWithPlayers.concat(trashCards[1]).concat(" ");
 			if(!isThirdCardValid) cardsNotWithPlayers = cardsNotWithPlayers.concat(trashCards[2]).concat(" ");
 			cardsNotWithPlayers = cardsNotWithPlayers + "]";
-			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " did not pass a valid card from their hand. Player does not have these cards: " + cardsNotWithPlayers;
+			/*  
+			 * The below msg is very explicit.  we will hide this information from the other users in case a user tries to collude with another user by providing this information
+			 */
+			//String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " did not pass a valid card from their hand. Player does not have these cards: " + cardsNotWithPlayers;
+			String cheat = LoggedInPlayer.getLoggedInPlayerSso() + " did not pass a valid card from their hand.  Cheating detected.";
 			gameService.setCheaterMsg(playerId, gameBoard.getGameId(), cheat);
 	    	return board(-1, model);
 		} else {
