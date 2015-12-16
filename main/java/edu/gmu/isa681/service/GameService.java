@@ -28,5 +28,4 @@ public interface GameService {
 	
 	public List<String> getPlayerCards(int playerId, int gameId);
 	
-	public void updateScores(int gameId);
 }

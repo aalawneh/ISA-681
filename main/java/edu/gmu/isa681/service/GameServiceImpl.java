@@ -503,7 +503,7 @@ public class GameServiceImpl implements GameService {
 		return gameDto;
 	}
 	
-	public Integer currRound(int gameId) {
+	private Integer currRound(int gameId) {
 		
 		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
 		
@@ -517,7 +517,7 @@ public class GameServiceImpl implements GameService {
 		return currRound;
     }		
 
-	public List<Integer> playersInCurrRound(int gameId) {
+	private List<Integer> playersInCurrRound(int gameId) {
 		
 		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
 		
@@ -534,7 +534,7 @@ public class GameServiceImpl implements GameService {
 		return totalPlayersInRound;
     }
 
-	public List<Integer> playersInRoundById(int gameId, int roundId) {
+	private List<Integer> playersInRoundById(int gameId, int roundId) {
 		
 		List<Object[]> result = gameMoveDao.getRoundById(gameId,roundId);
 		
@@ -551,7 +551,7 @@ public class GameServiceImpl implements GameService {
 		return totalPlayersInRound;
     }
 	
-	public List<String> cardsInCurrRound(int gameId) {
+	private List<String> cardsInCurrRound(int gameId) {
 		
 		List<Object[]> result = gameMoveDao.getCurrRound(gameId);
 		
@@ -568,7 +568,7 @@ public class GameServiceImpl implements GameService {
 		return cardsInRound;
     }
 
-	public List<String> cardsInRoundById(int gameId, int roundId) {
+	private List<String> cardsInRoundById(int gameId, int roundId) {
 	    System.out.println("---------------------- in  cardsinroundbyid ");
 		
 		List<Object[]> result = gameMoveDao.getRoundById(gameId, roundId);
@@ -703,7 +703,7 @@ public class GameServiceImpl implements GameService {
 	}
 	
 	//if 
-	public int endPlay(int gameId) {
+	private int endPlay(int gameId) {
 	//return -1 if not end of hand.
 	//return 0 if hand ended
 	//return 1 if hand ended and game over
@@ -743,11 +743,11 @@ public class GameServiceImpl implements GameService {
 		return -1;
 	}
 	
-	public int isGameOver(int gameId) {
+	private int isGameOver(int gameId) {
 		//get all users in game
 		List<Integer> players;
 		players = playersInCurrRound(gameId);
-		int gameOverScore=30;  //set to something else if testing game over
+		int gameOverScore=100;  //set to something else if testing game over
 		
 		System.out.println("+++++++++++++++++ calling isGameOver");
 		//look at scores, if one user is above gameOverScore, then game over
@@ -766,7 +766,7 @@ public class GameServiceImpl implements GameService {
 		return 0;
 	}
 	
-	public List<Integer> determineWinner(int gameId) {
+	private List<Integer> determineWinner(int gameId) {
 		List<Integer> winners = new ArrayList<Integer>();
 		int min = 1000000;
 
@@ -855,7 +855,7 @@ public class GameServiceImpl implements GameService {
 		return gameMoveDao.getPlayerCards(playerId, gameId);
 	}	
 	
-	public void updateScores(int gameId) {
+	private void updateScores(int gameId) {
 
     	Integer currRound = currRound(gameId);
 		List<String> cardsInRound; 

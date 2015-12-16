@@ -1,21 +1,31 @@
--- database passowrd for admin user "root" is welcome1
+-- database passowrd for admin user "root" should be known
 
+-- create the database needed for Secure Hearts Game
 create database HeartsDB;
--- drop database HeartsDB;
+-- if we want to start from scratch, run "drop database HeartsDB;"
+
+--verify database is included
 show databases;
 
+--create HeartsUser and grant permissions
 grant usage on *.* to HeartsUser@localhost identified by 'Hearts4MyAdmin!]';
 create user 'HeartsUser'@'%' identified by 'Hearts4MyAdmin!]';
+
+-- if we want to start over and delete the Hearts user, run the following commands.
 --SELECT User FROM mysql.user;
 --DROP USER 'HeartsUser'@'localhost';
 
+-- grant permissions for user on localhost server
 grant all privileges on HeartsDB.* to HeartsUser@localhost;
+
+-- grant permissions for user accessing server from over the network
 grant all privileges on HeartsDB.* to 'HeartsUser'@'%';
 
+-- login command to mysql using Hearts User
 mysql -u HeartsUser -p 'Hearts4MyAdmin!]' HeartsDB;
-
 use HeartsDB;
 
+-- create the following tables
 /*All Players who wants to play the game gets stored in PLAYER table*/
 create table PLAYER (
    player_id BIGINT NOT NULL AUTO_INCREMENT,
@@ -56,7 +66,8 @@ create table GAME_MOVE (
    PRIMARY KEY (player_id, game_id, hand_id, card_id)
 );
 
-select * from GAME_MOVE;
-truncate table GAME_MOVE;
-delete from GAME_PLAYER where game_id = 10;
-delete from GAME where game_id = 10;
+--procedures to wipe tables if we need to reset and start from scratch
+-- select * from GAME_MOVE;
+-- truncate table GAME_MOVE;
+-- delete from GAME_PLAYER where game_id = 10;
+-- delete from GAME where game_id = 10;
