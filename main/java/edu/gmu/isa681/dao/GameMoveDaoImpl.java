@@ -223,5 +223,31 @@ public class GameMoveDaoImpl extends AbstractDao<Integer, GameMove> implements G
 		return result;				
 	}
 	
-	
+	public void updatePlayerCard(int playerId, int gameId, int handId, String oldCardId, String newCardId) {
+		System.out.println("++++++++++++++++ in updatePlayerCard method");
+
+    	System.out.println("+++++++++++++++++++++++++ playerId = " + playerId);
+    	System.out.println("+++++++++++++++++++++++++ gameId = " + gameId);
+    	System.out.println("+++++++++++++++++++++++++ handId = " + handId);
+    	System.out.println("+++++++++++++++++++++++++ oldCardId = " + oldCardId);
+    	System.out.println("+++++++++++++++++++++++++ newCardId = " + newCardId);
+
+		String hql = "update GameMove gameMove "
+				+ " set gameMove.gameMoveKey.cardId = :newCardId "
+				+ " where gameMove.gameMoveKey.playerId = :playerId "
+				+ " and gameMove.gameMoveKey.gameId = :gameId "
+				+ " and gameMove.gameMoveKey.handId = :handId "
+				+ " and gameMove.gameMoveKey.cardId = :oldCardId ";
+	    
+		Query query = getSession().createQuery(hql)
+				.setInteger("playerId", (int)playerId)
+				.setInteger("gameId", (int)gameId)
+				.setInteger("handId", (int)handId)
+				.setString("newCardId", newCardId.trim().toLowerCase())
+				.setString("oldCardId", oldCardId.trim().toLowerCase());
+
+		int result = query.executeUpdate();
+		
+		System.out.println("Rows affected: " + result);				
+	}
 }

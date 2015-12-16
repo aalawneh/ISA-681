@@ -21,4 +21,6 @@ public interface GameMoveDao {
 	public void updateCardStatus(int playerId, int gameId, int handId, String cardId, int roundId);
 
 	public List<Object[]> getGameMoves(int gameId, String gameStatus);
+	
+	public void updatePlayerCard(int playerId, int gameId, int handId, String oldCardId, String newCardId);
 }

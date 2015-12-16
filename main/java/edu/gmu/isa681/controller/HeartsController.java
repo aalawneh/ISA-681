@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.gmu.isa681.model.Player;
+import edu.gmu.isa681.model.TrashCards;
 import edu.gmu.isa681.model.UnregisteredPlayer;
 import edu.gmu.isa681.model.GameBoard;
 import edu.gmu.isa681.dto.GameDto;
@@ -181,6 +182,26 @@ public class HeartsController {
         return "redirect:/board";
     }
     
+    
+    @RequestMapping(value="/trashCards", method = RequestMethod.POST)
+    public String trashCards (@Valid GameBoard gameBoard, 
+	           BindingResult result, ModelMap model) {
+    	int playerId = LoggedInPlayer.getLoggedInPlayerId();
+    	int gameId = gameBoard.getGameId();
+    	String[] trashCards = gameBoard.getTrashCards();
+    	
+    	if(trashCards.length < 4) {
+    		// display error and do not continue.
+    	}
+    	
+    	System.out.println("_______________________________ GameID=" + gameId);
+    	System.out.println("_______________________________ cardId=" + trashCards[0]);
+    	
+    	gameService.trashCards(gameId, playerId, trashCards);    	
+    	
+        return "redirect:/board";
+    }    
+    
     //, @RequestParam(value="oldGameId") Integer oldGameId
     @RequestMapping(value="/board", method = RequestMethod.GET)
     public String board(@RequestParam(value = "oldGameId", defaultValue = "-1", required = false) final Integer oldGameId, ModelMap model) {
@@ -236,6 +257,33 @@ public class HeartsController {
             gameMoves = gameService.getGameMoves(playerId);
         }
     	model.addAttribute("gameMoves", gameMoves);
+    	
+    	// 1. did the player pass cards
+    	if(gameService.getGameStatusForPlayer(playerId).equals("W") != true && gameService.didPlayerTrashCards(game.getGameId(), playerId)) {
+    		// yes he did
+    		model.addAttribute("playerTrashCards", true);
+    		
+    		// get the cards he trashed
+    		List<String> trashCards = gameService.getPlayerTrashCards(game.getGameId(), playerId);
+    		
+    		model.addAttribute("firstCard", trashCards.get(0));
+    		model.addAttribute("secondCard", trashCards.get(1));
+    		model.addAttribute("thirdCard", trashCards.get(2));
+    		
+    		
+    		// 2. did all players pass cards, can we play?
+    		boolean didAllPlayersTrashCards = gameService.didAllPlayersTrashCards(game.getGameId());
+    		
+    		if(didAllPlayersTrashCards) {
+    			model.addAttribute("allPlayersTrashCards", true);
+    		}
+    		else {
+    			model.addAttribute("allPlayersTrashCards", false);
+    		}
+    	}
+    	else {
+    		model.addAttribute("playerTrashCards", false);
+    	}
     	
         return "board";
     }

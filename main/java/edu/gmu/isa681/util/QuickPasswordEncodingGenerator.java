@@ -3,6 +3,8 @@ package edu.gmu.isa681.util;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.codec.Hex;
 
+import java.util.Arrays;
+
 public class QuickPasswordEncodingGenerator {
 
 	/**

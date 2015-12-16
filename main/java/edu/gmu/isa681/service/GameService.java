@@ -28,4 +28,13 @@ public interface GameService {
 	
 	public List<String> getPlayerCards(int playerId, int gameId);
 	
+	public void updateScores(int gameId);
+	
+	public boolean didAllPlayersTrashCards(int gameId);
+
+	public boolean didPlayerTrashCards(int gameId, int playerId);
+	
+	public List<String> getPlayerTrashCards(int gameId, int playerId);
+	
+	public void trashCards(int gameId, int srcPlayerId, String[] trashCards);
 }

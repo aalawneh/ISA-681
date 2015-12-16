@@ -66,6 +66,15 @@ create table GAME_MOVE (
    PRIMARY KEY (player_id, game_id, hand_id, card_id)
 );
 
+create table TRASH_CARDS (
+	game_id BIGINT NOT NULL,
+	hand_id BIGINT NOT NULL,
+	srcplayer_id BIGINT NOT NULL,
+	destplayer_id BIGINT NOT NULL,
+	cards VARCHAR(100) NOT NULL,
+	PRIMARY KEY (game_id, hand_id, srcplayer_id, destplayer_id)
+);
+
 --procedures to wipe tables if we need to reset and start from scratch
 -- select * from GAME_MOVE;
 -- truncate table GAME_MOVE;

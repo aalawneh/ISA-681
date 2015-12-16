@@ -3,6 +3,7 @@ package edu.gmu.isa681.service;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import edu.gmu.isa681.dao.GameDao;
 import edu.gmu.isa681.dao.GameMoveDao;
 import edu.gmu.isa681.dao.GamePlayerDao;
 import edu.gmu.isa681.dao.PlayerDao;
+import edu.gmu.isa681.dao.TrashCardsDao;
 import edu.gmu.isa681.dto.GameDto;
 import edu.gmu.isa681.dto.GameMoveDto;
 import edu.gmu.isa681.dto.OpponentsDto;
@@ -23,6 +25,7 @@ import edu.gmu.isa681.model.GamePlayer;
 import edu.gmu.isa681.model.GamePlayerKey;
 import edu.gmu.isa681.model.GameStatus;
 import edu.gmu.isa681.model.Player;
+import edu.gmu.isa681.model.TrashCards;
 import edu.gmu.isa681.util.PlayingCardDealer;
 
 @Service("gameService")
@@ -40,6 +43,9 @@ public class GameServiceImpl implements GameService {
 
 	@Autowired
 	private GameMoveDao gameMoveDao;
+	
+	@Autowired
+	private TrashCardsDao trashCardsDao;
 	
 	public PlayerGamesDto getPlayerGamesResults(int playerId) {
 		List<GamePlayer> games = gamePlayerDao.getPlayerGamesResults(playerId);
@@ -209,16 +215,18 @@ public class GameServiceImpl implements GameService {
 
 		if (whoseTurnId >= 0 ){		
 			gameDto.setPlayerCards(playerCards);
-			gameDto.setWhoseTurnId(whoseTurnId);
-			Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
-			System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
-			gameDto.setWhoseTurnName(whoseTurn.getSsoId());
-			//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 			gameDto.setCardsInRound(cardsInRound);
-			if (twoofclubs == 1) {
-				gameDto.setGameMsg(whoseTurn.getSsoId() + ": must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
-			} else {
-				gameDto.setGameMsg(gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+			if(didAllPlayersTrashCards(playerOpenGame.getGamePlayerKey().getGameId())) {
+				gameDto.setWhoseTurnId(whoseTurnId);
+				Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
+				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
+				gameDto.setWhoseTurnName(whoseTurn.getSsoId());
+				//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
+				if (twoofclubs == 1) {
+					gameDto.setGameMsg(whoseTurn.getSsoId() + ": must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+				} else {
+					gameDto.setGameMsg(gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+				}
 			}
 		}
 			
@@ -484,19 +492,20 @@ public class GameServiceImpl implements GameService {
 
 			if (whoseTurnId >= 0 ){		
 				gameDto.setPlayerCards(playerCards);
-				gameDto.setWhoseTurnId(whoseTurnId);
-				Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
-				System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
-				gameDto.setWhoseTurnName(whoseTurn.getSsoId());
-				//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
 				gameDto.setCardsInRound(cardsInRound);
-				if (twoofclubs == 1) {
-					gameDto.setGameMsg(whoseTurn.getSsoId() + ": must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
-				} else {
-					gameDto.setGameMsg(gamePlayerDao.getGameMessage(gameToJoin.getGamePlayerKey().getPlayerId(), gameToJoin.getGamePlayerKey().getGameId()));
+				if(didAllPlayersTrashCards(playerOpenGame.getGamePlayerKey().getGameId())) {
+					gameDto.setWhoseTurnId(whoseTurnId);
+					Player whoseTurn = playerDao.findPlayerById(whoseTurnId);			
+					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW whoseTurnId: " + whoseTurnId);
+					gameDto.setWhoseTurnName(whoseTurn.getSsoId());
+					//gameDto.setWhoseTurnName(whoseTurn.getFirstName() + " " + whoseTurn.getLastName());
+					if (twoofclubs == 1) {
+						gameDto.setGameMsg(whoseTurn.getSsoId() + ": must start the game with the two of clubs.<br>" + gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+					} else {
+						gameDto.setGameMsg(gamePlayerDao.getGameMessage(playerOpenGame.getGamePlayerKey().getPlayerId(), playerOpenGame.getGamePlayerKey().getGameId()));
+					}
 				}
 			}
-			
 		}
 		gameDto.setGameStatus(getGameStatusForPlayer(gameToJoin.getGamePlayerKey().getPlayerId()));
 		
@@ -937,5 +946,136 @@ public class GameServiceImpl implements GameService {
 	    		} 
     	    }
     	}
+	}
+
+	public boolean didAllPlayersTrashCards(int gameId) {
+		boolean didAllPlayersPassCards = false;
+		
+		// get the current hand
+		int currHand = gameMoveDao.getCurrHand(gameId);
+		
+		// Did the player pass cards -- if he did then we must have saved his cards to the table
+		List<TrashCards> trashCards = trashCardsDao.getAllPlayersTrashCards(gameId, currHand);
+		if(trashCards != null && trashCards.size() == 4) {
+			// if all players pass cards then we need to update all players cards now based on what was passed to them
+			
+			for(TrashCards tc : trashCards) {
+				int playerId = tc.getTrashCardsKey().getSrcPlayerId();
+				String passedCards = tc.getCards();
+				String recievedCards = null;
+				
+				for(TrashCards tc2 : trashCards) {
+					if(tc2.getTrashCardsKey().getDestPlayerId() == playerId) {
+						recievedCards = tc2.getCards();
+						break;
+					}
+				}
+				
+				// now we have passedCards and recievedCards .. let us swap them in the database.
+				List<String> passCards = new ArrayList<String>();
+				StringTokenizer st1 = new StringTokenizer(passedCards);
+				while(st1.hasMoreTokens()) {
+					String token = st1.nextToken("::");
+					passCards.add(token);
+				}
+				
+				StringTokenizer st2 = new StringTokenizer(recievedCards);
+				List<String> recCards = new ArrayList<String>();
+				while(st2.hasMoreTokens()) {
+					String token = st2.nextToken("::");
+					recCards.add(token);
+				}
+				
+				for(int i=0; i<3; i++) {
+					//update the database
+					gameMoveDao.updatePlayerCard(playerId, gameId, currHand, passCards.get(i), recCards.get(i));
+				}
+			}
+			
+			return true;
+		}
+		
+		return didAllPlayersPassCards;
+	}
+	
+	public boolean didPlayerTrashCards(int gameId, int playerId) {
+		boolean didPlayerPassCards = false;
+		
+		// get the current hand
+		int currHand = gameMoveDao.getCurrHand(gameId);
+		int tempCurrHand = currHand % 4;
+		if(tempCurrHand == 0)
+			return true;	
+		
+		// Did the player pass cards -- if he did then we must have saved his cards to the table
+		List<TrashCards> trashCards = trashCardsDao.getPlayerTrashCards(gameId, currHand, playerId);
+		if(trashCards != null && !trashCards.isEmpty()) {
+			return true;
+		}
+		return didPlayerPassCards;
+	}
+
+	public List<String> getPlayerTrashCards(int gameId, int playerId) {
+		// get the current hand
+		int currHand = gameMoveDao.getCurrHand(gameId);
+		// Did the player pass cards -- if he did then we must have saved his cards to the table
+		List<TrashCards> trashCards = trashCardsDao.getPlayerTrashCards(gameId, currHand, playerId);
+		
+		List<String> playerCards = new ArrayList<String>();
+		if(trashCards != null && !trashCards.isEmpty()) {
+			String cards = trashCards.get(0).getCards();
+			StringTokenizer st = new StringTokenizer(cards);
+			while(st.hasMoreTokens()) {
+				String token = st.nextToken("::");
+				playerCards.add(token);
+			}
+		}
+
+		return playerCards;
+	}
+	
+	public void trashCards(int gameId, int srcPlayerId, String[] trashCards) {
+		
+		String cards = trashCards[0].concat("::").concat(trashCards[1]).concat("::").concat(trashCards[2]);
+
+		// get the current hand
+		int currHand = gameMoveDao.getCurrHand(gameId);
+		int tempCurrHand = currHand % 4;
+		
+		if(tempCurrHand != 0) {
+			
+			List<GamePlayer> players = gamePlayerDao.getPlayersInGame(gameId);
+			int srcPlayerPosition = -1;
+			for(GamePlayer gp : players) {
+				if(gp.getGamePlayerKey().getPlayerId() == srcPlayerId) {
+					srcPlayerPosition = gp.getPosition();
+					break;
+				}
+			}
+			
+			int destPlayerPosition = -1;
+					
+			int result = srcPlayerPosition + tempCurrHand;
+			if(result < 4) {
+				destPlayerPosition = result;
+			}
+			else {
+				destPlayerPosition = result % 4;
+			}
+			
+			// now get destPlayerId
+			int destPlayerId = -1;
+			for(GamePlayer gp : players) {
+				if(gp.getPosition() == destPlayerPosition) {
+					destPlayerId = gp.getGamePlayerKey().getPlayerId();
+					break;
+				}
+			}
+			
+			System.out.println("______________________________________________ result " + result);
+			System.out.println("______________________________________________ playerPosition " + srcPlayerPosition);
+			System.out.println("______________________________________________ destPlayerPosition " + destPlayerPosition);
+			trashCardsDao.trashCards(gameId, currHand, srcPlayerId, destPlayerId, cards);
+		}
 	}
 }

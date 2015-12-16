@@ -13,13 +13,15 @@
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<!-- uncomment the below line to refresh the data constantly -->
-	<meta http-equiv="refresh" content="10">
+	<c:if test="${playerTrashCards eq true}">
+	    <meta http-equiv="refresh" content="10" />
+	</c:if>
 	<title>Hearts Playing Cards</title>
 	
 	<link rel="stylesheet" type="text/css" href="<c:url value='/static/css/cards.css' />" media="screen" />
@@ -28,21 +30,38 @@
 	<!-- the following js and css is not part of the CSS cards, but only for this example page -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.js"></script>
 	<script type="text/javascript">
+		$(document).ready(function() {
+			$("input[type='checkbox']").change(function(e) {
+				if ($('input[type="checkbox"]:checked').length >= 3) {
+					e.preventDefault();
+			        //alert($("input[type='checkbox']").value);
+					$('input[type="checkbox"]').not(':checked').prop('disabled', true);
+					
+					var checkedValues = $('input:checkbox:checked').map(function() {
+						 return this.value;
+					}).get();					
+					
+					$('#trashCards').val(checkedValues);
+					if (confirm("You're not allowed to choose more than 3 cards.\nClick OK to pass them or Cancel to pick others!")){
+						$("#trashCardsForm").submit();
+					}				}
+				else {
+					$('input[type="checkbox"]').not(':checked').removeProp('disabled');
+				}
+			});
+		});
+		
 		<!--
-			$(document).ready(function() {
-				$('.options').addClass('active');
-				$('.toggle li').click(function() {
-					$('.playingCards').toggleClass($(this).text());
-				});
-				$('.lang li').click(function() {
-					$('html').attr('lang', $(this).text());
-					$('html').attr('xml:lang', $(this).text());
-				});
+			$('.options').addClass('active');
+			$('.toggle li').click(function() {
+				$('.playingCards').toggleClass($(this).text());
+			});
+			$('.lang li').click(function() {
+				$('html').attr('lang', $(this).text());
+				$('html').attr('xml:lang', $(this).text());
 			});
 		//-->
-	</script>
-	
-	
+	</script>	
 	<style type="text/css"></style>
 	<style>
 	    #table_wrapper{background:tomato;border:1px solid olive;float:left;}
@@ -184,7 +203,7 @@
 					<table border="0" width="100%">
 						<tr valign="top">
 							<td width="33%" height="3.6em;" nowrap="nowrap" align="left">
-							    Player's turn: <c:out value="${game.whoseTurnName}"/> <br>
+							    Player's turn: <c:out value="${game.whoseTurnName}"/> <br/>
 							    ${game.gameMsg} 
 							</td>
 							<td width="33%" height="3.6em;" nowrap="nowrap">

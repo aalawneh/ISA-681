@@ -4,6 +4,7 @@ package edu.gmu.isa681.model;
 public class GameBoard {
 	private int gameId;
 	private String cardId;
+	private String[] trashCards;
 	
 	public int getGameId() {
 		return gameId;
@@ -16,5 +17,12 @@ public class GameBoard {
 	}
 	public void setCardId(String cardId) {
 		this.cardId = cardId;
+	}
+	
+	public String[] getTrashCards() {
+		return trashCards;
+	}
+	public void setTrashCards(String[] trashCards) {
+		this.trashCards = trashCards;
 	}
 }
